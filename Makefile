@@ -52,6 +52,15 @@ all: help
 help: ## 使用帮助
 	@echo "$$(grep -hE '^\S+:.*##' $(MAKEFILE_LIST) | sed -e 's/:.*##\s*/:/' -e 's/^\(.\+\):\(.*\)/\\033[36m\1\\033[m:\2/' | column -c2 -t -s :)"
 
+update: ## 更新
+	git submodule sync
+	git submodule foreach --recursive git reset --hard 
+	git submodule foreach --recursive git clean -fdx
+	git submodule init
+	git submodule update
+	git submodule update --remote
+	git submodule foreach  --recursive 'tag="$$(git config -f $$toplevel/.gitmodules submodule.$$name.tag)";[ -n $$tag ] && git reset --hard  $$tag || echo "this module has no tag"'
+
 
 build: dockerfile version
 	# $(DOCKERRUN) --rm -w /app -v$$(pwd):/app node:lts \

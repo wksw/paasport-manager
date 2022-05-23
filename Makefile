@@ -54,5 +54,7 @@ help: ## 使用帮助
 
 
 build: dockerfile version
+	# $(DOCKERRUN) --rm -w /app -v$$(pwd):/app node:lts \
+	# 	/bin/bash -c " yarn run build" 
 	$(DOCKERBUILD) -t $(DOCKER_REPO)/$(DOCKERIMAGE):$(VERSION) .
 	$(DOCKERPUSH) $(DOCKER_REPO)/$(DOCKERIMAGE):$(VERSION) || true

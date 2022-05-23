@@ -56,7 +56,7 @@
       {
         name: 'login',
         path: '/login',
-        component: './account/Login',
+        component: './Account/Login',
       },
       {
         component: './404',

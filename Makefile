@@ -18,6 +18,21 @@ DOCKERTAG=$(DOCKER) tag
 
 # docker镜像名称
 DOCKERIMAGE=paasport-manager
+# 命名空间
+NAMESPACE = $(WHOAREYOU)
+ifdef WHOAREYOU
+	NAMESPACE = $(WHOAREYOU)
+else
+	NAMESPACE = passport
+endif
+
+# 租户名称
+TENANT = $(TENANT_NAME)
+ifdef TENANT_NAME
+    TENANT = $(TENANT_NAME)
+else
+    TENANT = paasport
+endif
 
 # 镜像仓库
 DOCKER_REPO_HOST = $(REGISTRY_ADDRESS)
@@ -39,5 +54,5 @@ help: ## 使用帮助
 
 
 build: dockerfile version
-	$(DOCKERBUILD) -t $(DOCKER_REPO)/$(DOCKERIMAGE):$(VERSION)
+	$(DOCKERBUILD) -t $(DOCKER_REPO)/$(DOCKERIMAGE):$(VERSION) .
 	$(DOCKERPUSH) $(DOCKER_REPO)/$(DOCKERIMAGE):$(VERSION) || true

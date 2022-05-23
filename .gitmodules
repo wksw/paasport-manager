@@ -1,0 +1,4 @@
+[submodule "src/services/paasport"]
+	path = src/services/paasport
+	url = ssh://git@gitlab.zieldev.com:10022/paasport/protos-repo.git
+	branch = dev 

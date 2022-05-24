@@ -124,7 +124,15 @@ const paasportRequestInterceptor: RequestInterceptor = (
   options: RequestOptionsInit,
 ) => {
   if (!url.startsWith('http')) {
-    url = process.env.base_url + url;
+    const base_url = GetStorage("PAASPORT-ENDPOINT")
+    if (base_url == null) {
+      history.push(loginPath);
+      return {
+        url: url,
+        options,
+      };
+    }
+    url = base_url + url;
   }
 
   options.headers = {
@@ -133,15 +141,18 @@ const paasportRequestInterceptor: RequestInterceptor = (
   };
   const token = GetStorage('X-Auth-Token');
   console.log('---getTokenDetail: ', token);
+
   if (token == null) {
     return {
       url: url,
       options,
     };
   }
+  const tenant = GetStorage("PAASPORT-CURRENT-TENANT")
   options.headers = {
     ...options.headers,
     'X-Auth-Token': token.token,
+    'paasport-tenant-name': tenant == null ? 'paasport' : tenant,
   };
   return {
     url: url,

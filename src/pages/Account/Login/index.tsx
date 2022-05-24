@@ -6,17 +6,18 @@ import {
   UserOutlined,
   WeiboCircleOutlined,
 } from '@ant-design/icons';
-import { Alert, message, Tabs } from 'antd';
-import React, { useState } from 'react';
-import { ProFormCaptcha, ProFormCheckbox, ProFormText, LoginForm } from '@ant-design/pro-form';
+import { Alert, Cascader, message, Tabs } from 'antd';
+import React, { useEffect, useState } from 'react';
+import { ProFormCaptcha, ProFormCheckbox, ProFormText, LoginForm, ProFormSelect } from '@ant-design/pro-form';
 import { useIntl, history, FormattedMessage, useModel } from 'umi';
 import Footer from '@/components/Footer';
 // import { login } from '@/services/ant-design-pro/api';
 import { LoginWithPassword } from '@/services/paasport/login/login_umirequest';
-import { Set as SetStorage } from '@/storage/storage';
+import { Set as SetStorage, Get as GetStorage } from '@/storage/storage';
 import { getFakeCaptcha } from '@/services/ant-design-pro/login';
 import styles from './index.less';
 import { RegionTenantSelect } from '@/components/RightContent/RegionTenantSelect';
+import { locale } from 'moment';
 
 const LoginMessage: React.FC<{
   content: string;
@@ -47,6 +48,74 @@ const Login: React.FC = () => {
       }));
     }
   };
+
+  const endpoints = [{
+    label: '本地开发环境',
+    value: 'http://paasport.com:9091'
+  }, {
+    label: 'IDC开发环境',
+    value: 'https://cn-shenzhen.passport.zieldev.com:7443'
+  }, {
+    label: 'IDC生产环境',
+    value: 'https://cn-shenzhen.passport.ziel.cn:7443',
+  }, {
+    label: '香港生产环境',
+    value: 'https://passport-gw.zielhome.com',
+  }];
+
+  const tenants = {
+    'http://paasport.com:9091': [{
+      label: '主租户',
+      value: 'paasport'
+    }],
+    'https://cn-shenzhen.passport.zieldev.com:7443': [{
+      label: '主租户',
+      value: 'paasport'
+    }, {
+      label: '测试租户',
+      value: 'test'
+    }],
+    'https://cn-shenzhen.passport.ziel.cn:7443': [{
+      label: '主租户',
+      value: 'paasport'
+    }],
+    'https://passport-gw.zielhome.com': [{
+      label: '主租户',
+      value: 'paasport'
+    }, {
+      label: '测试租户',
+      value: 'test'
+    }, {
+      label: 'DE租户',
+      value: 'de'
+    }, {
+      label: 'FR租户',
+      value: 'fr'
+    }, {
+      label: 'GB租户',
+      value: 'gb'
+    }, {
+      label: 'US租户',
+      value: 'us'
+    }]
+  }
+
+  let localEndpoint = GetStorage('PAASPORT-ENDPOINT')
+  if (localEndpoint == null) {
+    localEndpoint = endpoints[0].value
+    SetStorage('PAASPORT-ENDPOINT', localEndpoint, -1)
+  }
+
+  const endpointTenants = tenants[localEndpoint]
+
+  let localTenant = GetStorage('PAASPORT-CURRENT-TENANT')
+  if (localTenant == null) {
+    localTenant = tenants[localEndpoint][0].value
+    SetStorage('PAASPORT-CURRENT-TENANT', localTenant, -1)
+  }
+
+  const [currentTenant, setCurrentTenant] = useState(localTenant)
+
 
   const handleSubmit = async (values: LOGIN.LoginWithPasswordReq) => {
     if (type === 'account') {
@@ -129,6 +198,36 @@ const Login: React.FC = () => {
           )}
           {type === 'account' && (
             <>
+              <ProFormSelect
+                request={async () => endpoints}
+                name="endpoint"
+                placeholder='请选择环境'
+                fieldProps={{
+                  defaultValue: localEndpoint,
+                  onChange: (value) => {
+                    console.log('------endpoint changed', value)
+                    setCurrentTenant(tenants[value][0].value)
+                    SetStorage('PAASPORT-ENDPOINT', value, -1);
+                    SetStorage('PAASPORT-CURRENT-TENANT', tenants[value][0].value, -1);
+                  }
+                }}
+              />
+              <ProFormSelect
+                request={async (param) => {
+                  console.log("-----------param", param);
+                  return param.endpoint ? tenants[param.endpoint] : endpointTenants
+                }}
+                name="tenant"
+                dependencies={['endpoint']}
+                fieldProps={{
+                  value: currentTenant,
+                  onChange: (value) => {
+                    setCurrentTenant(value)
+                    SetStorage('PAASPORT-CURRENT-TENANT', value, -1);
+                  }
+                }}
+                placeholder='请选择租户'
+              />
               <ProFormText
                 name="account"
                 fieldProps={{

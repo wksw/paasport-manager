@@ -84,6 +84,13 @@
         hideInMenu: true,
         component: './Transport/Track',
       },
+      {
+        path: '/transport/v2/track',
+        name: '物流查询',
+        layout: false,
+        hideInMenu: true,
+        component: './Transport/v2/Track',
+      },
     ],
   },
   {

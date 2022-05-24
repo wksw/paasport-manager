@@ -5,7 +5,7 @@ import { useModel, SelectLang } from 'umi';
 import Avatar from './AvatarDropdown';
 // import HeaderSearch from '../HeaderSearch';
 import styles from './index.less';
-import { RegionTenantSelect } from './RegionTenantSelect';
+// import { RegionTenantSelect } from './RegionTenantSelect';
 
 export type SiderTheme = 'light' | 'dark';
 
@@ -34,7 +34,7 @@ const GlobalHeaderRight: React.FC = () => {
       </span>
       <Avatar menu={true} />
       {/* <SelectLang className={styles.action} /> */}
-      <RegionTenantSelect />
+      {/* <RegionTenantSelect /> */}
     </Space>
   );
 };

@@ -62,8 +62,11 @@ update: ## 更新
 	git submodule foreach  --recursive 'tag="$$(git config -f $$toplevel/.gitmodules submodule.$$name.tag)";[ -n $$tag ] && git reset --hard  $$tag || echo "this module has no tag"'
 
 
-build: dockerfile version
+build: proto dockerfile version
 	# $(DOCKERRUN) --rm -w /app -v$$(pwd):/app node:lts \
 	# 	/bin/bash -c " yarn run build" 
 	$(DOCKERBUILD) -t $(DOCKER_REPO)/$(DOCKERIMAGE):$(VERSION) .
 	$(DOCKERPUSH) $(DOCKER_REPO)/$(DOCKERIMAGE):$(VERSION) || true
+
+proto: src/services/paasport
+	make -C src/services/paasport GOLANG_DISABLED=true CHASSIS_DISSABLED=true RESTFUL2GRPC_DISABLED=true GRAPHQL_DISABLED=true TYPESCRIPT_ENABLED=true build 

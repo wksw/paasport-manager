@@ -14,9 +14,11 @@ import { GetResourceBindRoles as GetAccountRoles } from '@/services/paasport/aut
 import defaultSettings from '../config/defaultSettings';
 // import defineConfig from '../config/config';
 import { Get as GetStorage } from './storage/storage';
+import { message } from 'antd';
 
 // const isDev = process.env.NODE_ENV === 'development';
 const loginPath = '/login';
+const trackV2Path = '/transport/v2/track'
 // const { base_url, app_id } = defineConfig;
 
 /** 获取用户信息比较慢的时候会展示一个 loading */
@@ -46,8 +48,9 @@ export async function getInitialState(): Promise<{
     }
     return undefined;
   };
+  console.log('get init state', history.location.pathname)
   // 如果不是登录页面，执行
-  if (history.location.pathname !== loginPath) {
+  if (history.location.pathname !== loginPath && history.location.pathname != trackV2Path) {
     const currentUser = await fetchUserInfo();
     return {
       fetchUserInfo,
@@ -71,11 +74,11 @@ export const layout: RunTimeLayoutConfig = ({ initialState, setInitialState }) =
     },
     footerRender: () => <Footer />,
     onPageChange: () => {
-      const { location } = history;
-      // 如果没有登录，重定向到 login
-      if (!initialState?.currentUser && location.pathname !== loginPath) {
-        history.push(loginPath);
-      }
+      // const { location } = history;
+      // // 如果没有登录，重定向到 login
+      // if (!initialState?.currentUser && location.pathname !== loginPath) {
+      //   history.push(loginPath);
+      // }
     },
     // links: isDev
     //   ? [
@@ -98,7 +101,7 @@ export const layout: RunTimeLayoutConfig = ({ initialState, setInitialState }) =
       return (
         <>
           {children}
-          {!props.location?.pathname?.includes('/login') && (
+          {/* {!props.location?.pathname?.includes('/login') && (
             <SettingDrawer
               disableUrlParams
               enableDarkTheme
@@ -110,7 +113,7 @@ export const layout: RunTimeLayoutConfig = ({ initialState, setInitialState }) =
                 }));
               }}
             />
-          )}
+          )} */}
         </>
       );
     },
@@ -140,19 +143,12 @@ const paasportRequestInterceptor: RequestInterceptor = (
     'Paasport-App-Id': process.env.app_id ?? '',
   };
   const token = GetStorage('X-Auth-Token');
-  console.log('---getTokenDetail: ', token);
-
-  if (token == null) {
-    return {
-      url: url,
-      options,
-    };
-  }
   const tenant = GetStorage("PAASPORT-CURRENT-TENANT")
+  console.log('--------tenant', tenant);
   options.headers = {
     ...options.headers,
-    'X-Auth-Token': token.token,
-    'paasport-tenant-name': tenant == null ? 'paasport' : tenant,
+    'X-Auth-Token': token?.token,
+    'paasport-tenant-name': tenant ? tenant : 'paasport'
   };
   return {
     url: url,
@@ -182,8 +178,11 @@ export const request: RequestConfig = {
   errorConfig: {
     adaptor: (resData: any, ctx: Context) => {
       return {
-        success: true,
-        showType: ErrorShowType.SILENT,
+        success: resData.code == 0 || resData.code == undefined,
+        errorCode: resData.err_code,
+        errorMessage: resData.error,
+        // showType: ErrorShowType.ERROR_MESSAGE,
+        // ...resData,
       };
     },
   },

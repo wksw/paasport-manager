@@ -13,6 +13,7 @@ import {
 } from '@ant-design/icons';
 import { Col, Row, Timeline, Tooltip, Typography } from 'antd';
 import { getCarrierV2 } from '@/utils/utils';
+import moment from 'moment';
 
 type TransportDetailProps = {
     detail: TRANSPORT_V2.TrackInfo;
@@ -135,7 +136,7 @@ export const TransportDetail: React.FC<TransportDetailProps> = (props) => {
                 <Timeline>
                     {detail?.track?.events?.map((item: any) => (
                         <Timeline.Item>
-                            <span style={{ fontWeight: 'bold' }}>{item?.created_at}</span> {item?.location?.country}{item?.location?.city ? ',' + item?.location?.city : ''}: {item?.description}
+                            <span style={{ fontWeight: 'bold' }}>{moment(item?.created_at).format("YYYY-MM-DD HH:mm:ss")}</span> {item?.location?.country}{item?.location?.city ? ',' + item?.location?.city : ''}: {item?.description}
                         </Timeline.Item>
                     ))}
                 </Timeline>

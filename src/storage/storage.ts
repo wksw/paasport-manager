@@ -10,12 +10,12 @@ export function Set(key: string, value: any, expires_at: number) {
 
 export function Get(key: string): any {
   const item = localStorage.getItem(key);
-  console.log('get ', key, 'from localstorage is ', item);
+  // console.log('get ', key, 'from localstorage is ', item);
   if (item == null) {
     return null;
   }
   const itemObject = JSON.parse(item);
-  console.log('item ', key, 'expires at', itemObject.expires_at, 'now is', Date.now());
+  // console.log('item ', key, 'expires at', itemObject.expires_at, 'now is', Date.now());
   if (itemObject.expires_at == -1) {
     return itemObject.data;
   }

@@ -75,7 +75,13 @@
       {
         path: '/transport/list',
         name: '物流追踪',
+        hideInMenu: true,
         component: './Transport',
+      },
+      {
+        path: '/transport/v2/list',
+        name: '物流追踪',
+        component: './Transport/v2',
       },
       {
         path: '/transport/track',

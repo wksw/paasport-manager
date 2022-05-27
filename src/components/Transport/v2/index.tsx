@@ -12,8 +12,7 @@ import {
     CloseCircleTwoTone,
 } from '@ant-design/icons';
 import { Col, Row, Timeline, Tooltip, Typography } from 'antd';
-// import countries from '@/services/17track_countries';
-// import styles from './index.less';
+import { getCarrierV2 } from '@/utils/utils';
 
 type TransportDetailProps = {
     detail: TRANSPORT_V2.TrackInfo;
@@ -94,20 +93,20 @@ export const TransportDetail: React.FC<TransportDetailProps> = (props) => {
             <Row align="middle" justify="center" style={{ marginBottom: '20px', marginLeft: '40px' }}>
                 <Col span={12}>
                     <Row align="middle">
-                        <Col span={4}>{packageStatusIcon(detail.package_status, 30)}</Col>
+                        <Col span={4}>{packageStatusIcon(detail?.package_status, 30)}</Col>
                         <Col span={20}>
                             <Row align="middle">
                                 <Col style={{ fontSize: 10 }}>
                                     <Typography.Text style={{ marginBottom: 0 }} ellipsis={true} copyable={true}>
-                                        {detail.number}
+                                        {detail?.number}
                                     </Typography.Text>
                                 </Col>
                             </Row>
                             <Row>
                                 <Col style={{ fontSize: 8 }}>
-                                    {detail.track.metrics.days_of_transit_done !== 0 && (
+                                    {detail?.track?.metrics?.days_of_transit_done !== 0 && (
                                         <Typography.Text type="secondary" style={{ marginBottom: 0 }}>
-                                            {'妥投时间 ' + detail.track.metrics.days_of_transit_done + ' (天)'}
+                                            {'妥投时间 ' + detail?.track?.metrics?.days_of_transit_done + ' (天)'}
                                         </Typography.Text>
                                     )}
                                 </Col>
@@ -119,24 +118,24 @@ export const TransportDetail: React.FC<TransportDetailProps> = (props) => {
                     <Row align="middle">
                         <Col span={10}>
                             <Row justify="center">
-                                <Col style={{ fontSize: 14 }}>{detail.track.departure.country}</Col>
+                                <Col style={{ fontSize: 14 }}>{detail?.track?.departure?.country}</Col>
                             </Row>
-                            {/* <Row justify="center">
-                                <Col style={{ fontSize: 14 }}>{getCarrier(detail)}</Col>
-                            </Row> */}
+                            <Row justify="center">
+                                <Col style={{ fontSize: 14 }}>{getCarrierV2(detail)}</Col>
+                            </Row>
                         </Col>
                         <Col span={4}>{'->'}</Col>
                         <Col span={10} style={{ fontSize: 14 }}>
-                            {detail.track.destination.country}
+                            {detail?.track?.destination?.country}
                         </Col>
                     </Row>
                 </Col>
             </Row>
             <Row justify="center">
                 <Timeline>
-                    {detail.track.events?.map((item: any) => (
+                    {detail?.track?.events?.map((item: any) => (
                         <Timeline.Item>
-                            <span style={{ fontWeight: 'bold' }}>{item.created_at}</span> {item.location.country},{item.location.city} {item.description}
+                            <span style={{ fontWeight: 'bold' }}>{item?.created_at}</span> {item?.location?.country}{item?.location?.city ? ',' + item?.location?.city : ''}: {item?.description}
                         </Timeline.Item>
                     ))}
                 </Timeline>

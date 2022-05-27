@@ -6,7 +6,6 @@ import {
   CloseSquareTwoTone,
   ExclamationCircleTwoTone,
   FrownTwoTone,
-  InfoCircleTwoTone,
   WarningTwoTone,
 } from '@ant-design/icons';
 import { Space, Tooltip } from 'antd';
@@ -37,6 +36,40 @@ export function getCarrier(detail: TRANSPORT.TrackInfo) {
             {v._name}{' '}
           </a>
         </Space>
+      );
+    }
+  }
+  if (carrier) {
+    if (final_carrier) {
+      return (
+        <div>
+          {carrier} <span>{'->'}</span> {final_carrier}
+        </div>
+      );
+    }
+    return carrier;
+  }
+  return <p>-</p>;
+}
+
+export function getCarrierV2(detail: TRANSPORT_V2.TrackInfo) {
+  var carrier;
+  var final_carrier;
+  for (const v of carriers) {
+    if (v.key == detail.carrier) {
+      carrier = (
+        <a href={v._url} target="view_window">
+          {' '}
+          {v._name}{' '}
+        </a>
+      );
+    }
+    if (v.key == detail.final_carrier) {
+      final_carrier = (
+        <a href={v._url} target="view_window">
+          {' '}
+          {v._name}{' '}
+        </a>
       );
     }
   }

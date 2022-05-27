@@ -8,6 +8,7 @@ import { TransportPackageStatusEnum, TransportStatusEnum } from '@/services/paas
 import { packageStatusIcon, TransportDetail } from '@/components/Transport';
 import { TransportStatus } from '@/services/paasport/common/common';
 import { Modal } from 'antd';
+import { history } from 'umi';
 import { getCarrier } from '@/utils/utils';
 import { PageContainer } from '@ant-design/pro-layout';
 // import moment from 'moment';
@@ -120,6 +121,9 @@ const Transport: React.FC = () => {
     <PageContainer
       header={{
         title: '',
+        extra: [
+          <a onClick={() => history.push("/transport/v2/list")}>v2版本</a>
+        ]
       }}
     >
       <ProTable<TRANSPORT.TrackInfo, TRANSPORT.FetchReq>

@@ -48,7 +48,7 @@ export async function getInitialState(): Promise<{
     }
     return undefined;
   };
-  console.log('get init state', history.location.pathname)
+  // console.log('get init state', history.location.pathname)
   // 如果不是登录页面，执行
   if (history.location.pathname !== loginPath && history.location.pathname != trackV2Path) {
     const currentUser = await fetchUserInfo();
@@ -144,7 +144,7 @@ const paasportRequestInterceptor: RequestInterceptor = (
   };
   const token = GetStorage('X-Auth-Token');
   const tenant = GetStorage("PAASPORT-CURRENT-TENANT")
-  console.log('--------tenant', tenant);
+  // console.log('--------tenant', tenant);
   options.headers = {
     ...options.headers,
     'X-Auth-Token': token?.token,
@@ -161,7 +161,7 @@ const paasportResponseInterceptor: ResponseInterceptor = (
   response: Response,
   options: RequestOptionsInit,
 ) => {
-  console.log('-----paasportResponseInterceptor: ', response);
+  // console.log('-----paasportResponseInterceptor: ', response);
   if (response.status == 401) {
     history.push(loginPath);
   }

@@ -1,4 +1,4 @@
-FROM node:lts as base
+FROM dockerhub.contoso.com/paasport/paasport-manager:build_latest as base
 
 WORKDIR /app
 

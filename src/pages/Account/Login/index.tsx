@@ -85,7 +85,7 @@ const Login: React.FC = () => {
         <LoginForm
           logo={<img alt="logo" src="/paasport.svg" />}
           title="aasport"
-          subTitle={intl.formatMessage({ id: 'pages.layouts.userLayout.title' })}
+          subTitle="plateform as a service port"
           initialValues={{
             autoLogin: true,
           }}

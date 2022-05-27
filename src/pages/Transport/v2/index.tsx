@@ -3,13 +3,16 @@ import React, { useRef, useState } from 'react';
 import {
     GetTracks,
     Registe,
+    DeleteTracks,
 } from '@/services/paasport/transport/v2/transport_v2_umirequest';
 import { packageStatusIcon, TransportDetail } from '@/components/Transport/v2';
-import { Modal } from 'antd';
+import { TransportPackageStatusEnumV2, TransportStatusEnumV2 } from '@/services/paasport';
+import { Button, Modal } from 'antd';
 import { getCarrier } from '@/utils/utils';
 import { PageContainer } from '@ant-design/pro-layout';
 import { history } from 'umi';
 import moment from 'moment';
+import { PlusOutlined } from '@ant-design/icons';
 
 const Transport: React.FC = () => {
     const [detail, setDetail] = useState<TRANSPORT_V2.TrackInfo>({});
@@ -19,6 +22,12 @@ const Transport: React.FC = () => {
         await Registe({ id: record.id });
         ref.current?.reload();
     };
+    const deleteTransport = async (record: TRANSPORT_V2.TrackInfo) => {
+        await DeleteTracks({
+            tracks: [{ id: record.id }]
+        })
+        ref.current?.reload();
+    }
     const columns: ProColumns<TRANSPORT_V2.TrackInfo>[] = [
         {
             title: '单号',
@@ -52,15 +61,16 @@ const Transport: React.FC = () => {
             title: '物流状态',
             dataIndex: 'track_status',
             key: 'track_status',
-            valueType: "text",
+            valueEnum: TransportStatusEnumV2,
         },
         {
             title: '包裹状态',
             dataIndex: 'package_status',
             key: 'package_status',
+            valueEnum: TransportPackageStatusEnumV2,
             render: (_, record) => [
                 packageStatusIcon(record.package_status, 15),
-                <span> {record.package_status}</span>,
+                <span> {TransportPackageStatusEnumV2[record.package_status]}</span>,
             ],
         },
         {
@@ -101,13 +111,13 @@ const Transport: React.FC = () => {
                 >
                     详情
                 </a>,
-                (record.track_status == "REGISTING" ||
-                    record.track_status == "REGISTE_FAIL") && (
-                    <TableDropdown
-                        key="actionGroup"
-                        menus={[{ key: 'reAdd', name: <a onClick={() => reAdd(record)}>重新注册</a> }]}
-                    />
-                ),
+                <TableDropdown
+                    key="actionGroup"
+                    menus={[
+                        { key: 'reAdd', name: <Button type="link" onClick={() => reAdd(record)} disabled={record.track_status != "REGISTING" && record.track_status != "REGISTE_FAIL"}>重新注册</Button> },
+                        { key: 'delete', name: <Button type="link" onClick={() => deleteTransport(record)} disabled={record.track_status == "DELTEING"}>删除</Button> },
+                    ]}
+                />,
             ],
         },
     ];
@@ -122,7 +132,13 @@ const Transport: React.FC = () => {
         >
             <ProTable<TRANSPORT_V2.TrackInfo, TRANSPORT_V2.GetTrackReq>
                 // search={false}
-                toolBarRender={false}
+                toolbar={{
+                    title: (<Button key="button" icon={<PlusOutlined />} type="primary">新建</Button>),
+                }}
+                options={{
+                    density: false,
+                    setting: false,
+                }}
                 rowKey="key"
                 columns={columns}
                 actionRef={ref}
@@ -163,7 +179,7 @@ const Transport: React.FC = () => {
                     return {
                         data: resp.data,
                         success: true,
-                        total: resp.total_count,
+                        total: resp.total,
                     };
                 }}
             ></ProTable>

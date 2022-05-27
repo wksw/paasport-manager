@@ -131,6 +131,40 @@ export const TransportStatusEnum = {
   11: '获取信息失败',
 };
 
+export const TransportStatusEnumV2 = {
+  "": "所有",
+  "REGISTING": "注册中",
+  "UPDATING": "更新中",
+  "STOPING": "停止中",
+  "RETRACKING": "重启追踪中",
+  "TRACKING": "追踪中",
+  "STOPED": "已停止",
+  "REGISTE_FAIL": "注册失败",
+  "UPDATE_FAIL": "更新失败",
+  "STOP_FAIL": "停止失败",
+  "RETRACK_FAIL": "重启失败",
+  "NO_TRACK": "暂无物流信息",
+  "PENDING": "等待追踪中",
+  "DELTEING": "删除中",
+  "DELETE_FAIL": "删除失败",
+  "DELETED": "已删除",
+}
+
+export const TransportPackageStatusEnumV2 = {
+  "": "所有",
+  "NOT_FOUND": "暂无包裹信息",
+  "IN_WAREHOUSE": "仓库处理中",
+  "INFO_RECEIVED": "待揽件",
+  "ORDERED": "已下单",
+  "IN_TRANSIT": "运输途中",
+  "AVAILABLE_FOR_PICKUP": "可取件",
+  "OUT_FOR_DELIVERY": "派送中",
+  "DELIVERY_FAIL": "派送失败",
+  "DELIVERED": "成功签收",
+  "EXPIRED": "运输过久",
+  "EXCEPTION": "包裹异常",
+}
+
 export const TransportPackageStatusEnum = {
   '-1': '所有状态',
   0: '查询不到',

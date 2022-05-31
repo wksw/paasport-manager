@@ -73,6 +73,11 @@
     name: '物流',
     routes: [
       {
+        path: '/transport/dashboard',
+        name: '看板',
+        component: './Transport/v2/Dashboard',
+      },
+      {
         path: '/transport/list',
         name: '物流追踪',
         hideInMenu: true,

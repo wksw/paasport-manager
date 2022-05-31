@@ -2,7 +2,7 @@ import { PageContainer } from '@ant-design/pro-layout';
 import React, { useEffect, useState } from 'react';
 // import { Shipments } from '@/components/Transport/v2/Analysis/Shipments/Shipments';
 // import { Exceptions } from '@/components/Transport/v2/Analysis/Shipments/Exceptions';
-import { TotalShipments } from '@/components/Transport/v2/Analysis/Shipments/TotalShipments';
+// import { TotalShipments } from '@/components/Transport/v2/Analysis/Shipments/TotalShipments';
 import ProCard from '@ant-design/pro-card';
 import moment from 'moment';
 import { Button } from 'antd';
@@ -11,14 +11,16 @@ import ProForm, { ProFormDateRangePicker } from '@ant-design/pro-form';
 import {
     TransportStatusAnalysis, TransportExceptionReasonAnalysis,
     TransportExceptionByCarrierAnalysis, TransportDeliveredAndNoDeliveredAnalysis,
-    TransportCountWithCarrierAnalysis
+    TransportCountWithCarrierAnalysis, TransportTrackStatusAnalysis
 } from '@/services/paasport/transport/v2/transport_v2_umirequest';
 import { Space, Typography } from 'antd';
 import { RightOutlined } from '@ant-design/icons';
 import { Column } from '@ant-design/plots';
-const { Text, Link } = Typography
+import { Link as ULink } from 'umi';
+const { Text } = Typography
 import { Pie } from '@ant-design/plots';
 import { Bar } from '@ant-design/plots';
+import carriers from '@/services/17track_carriers';
 
 
 const Dashboard: React.FC = () => {
@@ -36,25 +38,26 @@ const Dashboard: React.FC = () => {
     const [transportExceptionReasons, setTransportExceptionReasons] = useState({});
     const [transportOverTime, setTransportOverTime] = useState([]);
     const [transportWithCarrier, setTransportWithCarrier] = useState([]);
+    const [transportTrackStatus, setTransportTrackStatus] = useState([]);
     const dateRangeConfig = {
         name: 'startEnd',
         format: dateFormat,
     }
-    const [statstic, setStatstic] = useState({
-        total: 0,
-        exceptions: {
-            total: 0,
-            percent: 0.00
-        },
-        returnToSender: {
-            total: 0,
-            percent: 0.00
-        },
-        delivered: {
-            total: 0,
-            percent: 0.00
-        }
-    });
+    const [returnToSenderTotal, setReturnTosenderTotal] = useState(0);
+    const [statsticTotal, setStatsticTotal] = useState(0);
+    const [exceptionsTotal, setExceptionsTotal] = useState(0);
+    const [deliveredTotal, setDeliveredTotal] = useState(0);
+    // const [statstic, setStatstic] = useState({
+    //     total: 0,
+    //     exceptions: {
+    //         total: 0,
+    //         percent: 0.00
+    //     },
+    //     delivered: {
+    //         total: 0,
+    //         percent: 0.00
+    //     }
+    // });
     useEffect(() => {
         const getTransportStatusAnalysis = async () => {
             const resp = await TransportStatusAnalysis({
@@ -76,18 +79,21 @@ const Dashboard: React.FC = () => {
                     }
                 });
             }
-            setStatstic({
-                ...statstic,
-                total: resp.total,
-                exceptions: {
-                    total: exceptionTotal,
-                    percent: (exceptionTotal / resp.total * 100).toFixed(2),
-                },
-                delivered: {
-                    total: delivered,
-                    percent: (delivered / resp.total * 100).toFixed(2)
-                }
-            })
+            // setStatstic({
+            //     ...statstic,
+            //     total: resp.total,
+            //     exceptions: {
+            //         total: exceptionTotal,
+            //         percent: (exceptionTotal / resp.total * 100).toFixed(2),
+            //     },
+            //     delivered: {
+            //         total: delivered,
+            //         percent: (delivered / resp.total * 100).toFixed(2)
+            //     }
+            // })
+            setDeliveredTotal(delivered);
+            setExceptionsTotal(exceptionTotal);
+            setStatsticTotal(resp.total);
             setTransportStatus(resp);
         }
         const getTransportExceptionReasons = async () => {
@@ -100,18 +106,12 @@ const Dashboard: React.FC = () => {
             })
             if (resp.data) {
                 let returnToSender = 0
-                resp.data.forEach(element => {
+                resp.data.forEach((element: any) => {
                     if (element.package_sub_status == "EXCEPTION_RETURNING" || element.package_sub_status == "EXCEPTION_RETURNED") {
                         returnToSender += element.total;
                     }
                 })
-                setStatstic({
-                    ...statstic,
-                    returnToSender: {
-                        total: returnToSender,
-                        percent: returnToSender / statstic.total * 100,
-                    },
-                })
+                setReturnTosenderTotal(returnToSender)
             }
             setTransportExceptionReasons(resp)
         }
@@ -122,6 +122,13 @@ const Dashboard: React.FC = () => {
                 app_id: analysisReq.app_id,
                 carrier: analysisReq.carrier,
                 provider: analysisReq.provider,
+            })
+            resp.data.forEach(element => {
+                for (const v of carriers) {
+                    if (v.key == element.carrier) {
+                        element.carrier = v._name
+                    }
+                }
             })
             setTransportExceptions(resp)
         }
@@ -143,14 +150,32 @@ const Dashboard: React.FC = () => {
                 carrier: analysisReq.carrier,
                 provider: analysisReq.provider,
             })
+            resp.data.forEach(element => {
+                for (const v of carriers) {
+                    if (v.key == element.carrier) {
+                        element.carrier = v._name
+                    }
+                }
+            })
             setTransportWithCarrier(resp.data)
+        }
+        const getTransportTrackStatus = async () => {
+            const resp = await TransportTrackStatusAnalysis({
+                begin_date: analysisReq.begin_date?.format(rfc3339),
+                end_date: analysisReq.end_date?.format(rfc3339),
+                app_id: analysisReq.app_id,
+                carrier: analysisReq.carrier,
+                provider: analysisReq.provider,
+            })
+            setTransportTrackStatus(resp.data);
         }
         getTransportStatusAnalysis();
         getTransportExceptionReasons();
         getTransportExceptions();
         getTransportOvertime();
         getTransportCountWithCarrier();
-    }, [analysisReq])
+        getTransportTrackStatus();
+    }, [])
     return (
         <PageContainer
             header={{
@@ -190,66 +215,64 @@ const Dashboard: React.FC = () => {
             <ProCard ghost gutter={8} style={{ marginTop: 16 }}>
                 <ProCard
                     title={<Text type="secondary">Total</Text>}
-                    extra={<RightOutlined
-                        onClick={() => {
-                        }}
-                    />}
+                    extra={<ULink to={{
+                        pathname: '/transport/v2/list',
+                    }}><RightOutlined /></ULink>}
                 >
                     <Space direction='vertical'>
-                        <Text style={{ fontSize: 20 }}>{statstic.total}</Text>
+                        <Text style={{ fontSize: 20 }}>{statsticTotal}</Text>
                         <Text type="secondary" style={{ visibility: 'hidden' }}> empty</Text>
                     </Space>
                 </ProCard>
                 <ProCard
                     title={<Text type="secondary">EXCEPTION</Text>}
-                    extra={<RightOutlined
-                        onClick={() => {
-                        }}
-                    />}
+                    extra={<ULink to={{
+                        pathname: '/transport/v2/list',
+                    }}><RightOutlined /></ULink>}
                 >
                     <Space direction='vertical'>
-                        <Text style={{ fontSize: 20 }}>{statstic.exceptions.total}</Text>
-                        <Text type="secondary">{statstic.exceptions.percent}% of total shipments</Text>
+                        <Text style={{ fontSize: 20 }}>{exceptionsTotal}</Text>
+                        <Text type="secondary">{(exceptionsTotal / statsticTotal * 100).toFixed(2)}% of total shipments</Text>
                     </Space>
                 </ProCard>
                 <ProCard
                     title={<Text type="secondary">RETURNED TO SENDER</Text>}
-                    extra={<RightOutlined
-                        onClick={() => {
-                        }}
-                    />}
+                    extra={<ULink to={{
+                        pathname: '/transport/v2/list',
+                    }}><RightOutlined /></ULink>}
                 >
                     <Space direction='vertical'>
-                        <Text style={{ fontSize: 20 }}>{statstic.returnToSender.total}</Text>
-                        <Text type="secondary">{statstic.returnToSender.percent}% of total shipments</Text>
+                        <Text style={{ fontSize: 20 }}>{returnToSenderTotal}</Text>
+                        <Text type="secondary">{(returnToSenderTotal / statsticTotal * 100).toFixed(2)}% of total shipments</Text>
                     </Space>
                 </ProCard>
                 <ProCard
                     title={<Text type="secondary">DELIVERED</Text>}
-                    extra={<RightOutlined
-                        onClick={() => {
-                        }}
-                    />}
+                    extra={<ULink to={{
+                        pathname: '/transport/v2/list',
+                    }}><RightOutlined /></ULink>}
                 >
                     <Space direction='vertical'>
-                        <Text style={{ fontSize: 20 }}>{statstic.delivered.total}</Text>
-                        <Text type="secondary">{statstic.delivered.percent}% of total shipments</Text>
+                        <Text style={{ fontSize: 20 }}>{deliveredTotal}</Text>
+                        <Text type="secondary">{(deliveredTotal / statsticTotal * 100).toFixed(2)}% of total shipments</Text>
                     </Space>
                 </ProCard>
             </ProCard>
             <ProCard ghost gutter={8} style={{ marginTop: 16 }}>
                 <ProCard
-                    title='Total shipments over time'
-                    extra={
-                        <Link>View details</Link>
-                    }
+                    title='Total track status'
                 >
-                    <Column
-                        data={transportOverTime}
-                        isStack={true}
-                        xField='ref_date'
-                        yField='total'
-                        seriesField='package_status'
+                    <Pie
+                        data={transportTrackStatus}
+                        angleField='total'
+                        colorField='track_status'
+                        radius={1}
+                        innerRadius={0.64}
+                        meta={{
+                            value: {
+                                formatter: (v) => v,
+                            }
+                        }}
                     />
                 </ProCard>
                 <ProCard
@@ -266,6 +289,39 @@ const Dashboard: React.FC = () => {
                                 formatter: (v) => v,
                             }
                         }}
+                    />
+                </ProCard>
+            </ProCard>
+
+            <ProCard ghost gutter={8} style={{ marginTop: 16 }}>
+                <ProCard
+                    title='Total shipments by carrier'
+                    extra={
+                        <ULink to={{
+                            pathname: '/transport/v2/list',
+                        }}>view detail</ULink>
+                    }
+                >
+                    <Bar
+                        data={transportWithCarrier}
+                        xField='total'
+                        yField='carrier'
+                        legend={{
+                        }}
+                    />
+                </ProCard>
+                <ProCard
+                    title='Total shipments over time'
+                    extra={<ULink to={{
+                        pathname: '/transport/v2/list',
+                    }}>view detail</ULink>}
+                >
+                    <Column
+                        data={transportOverTime}
+                        isStack={true}
+                        xField='ref_date'
+                        yField='total'
+                        seriesField='package_status'
                     />
                 </ProCard>
             </ProCard>
@@ -292,7 +348,7 @@ const Dashboard: React.FC = () => {
                     <Pie
                         data={transportExceptions?.data || []}
                         angleField='total'
-                        colorField='package_status'
+                        colorField='carrier'
                         radius={1}
                         innerRadius={0.64}
                         meta={{
@@ -302,21 +358,6 @@ const Dashboard: React.FC = () => {
                         }}
                     />
                 </ProCard>
-            </ProCard>
-            <ProCard
-                style={{ marginTop: 16 }}
-                title='Total shipments by carrier'
-                extra={
-                    <Link>View details</Link>
-                }
-            >
-                <Bar
-                    data={transportWithCarrier}
-                    xField='total'
-                    yField='carrier'
-                    legend={{
-                    }}
-                />
             </ProCard>
         </PageContainer >
     )

@@ -5,7 +5,7 @@ import React, { useEffect, useState } from 'react';
 // import { TotalShipments } from '@/components/Transport/v2/Analysis/Shipments/TotalShipments';
 import ProCard from '@ant-design/pro-card';
 import moment from 'moment';
-import { Button } from 'antd';
+import { Button, Row } from 'antd';
 import ProForm, { ProFormDateRangePicker } from '@ant-design/pro-form';
 // import { AnalysisReq } from '@/components/Transport/v2/Analysis/Shipments/typings.d';
 import {
@@ -44,6 +44,7 @@ const Dashboard: React.FC = () => {
         format: dateFormat,
     }
     const [returnToSenderTotal, setReturnTosenderTotal] = useState(0);
+    const [returningToSenderTotal, setReturningToSenderTotal] = useState(0);
     const [statsticTotal, setStatsticTotal] = useState(0);
     const [exceptionsTotal, setExceptionsTotal] = useState(0);
     const [deliveredTotal, setDeliveredTotal] = useState(0);
@@ -94,13 +95,18 @@ const Dashboard: React.FC = () => {
                 provider: analysisReq.provider,
             })
             if (resp.data) {
-                let returnToSender = 0
+                let returnToSender = 0;
+                let returningToSender = 0;
                 resp.data.forEach((element: any) => {
                     if (element.package_sub_status == "EXCEPTION_RETURNED") {
                         returnToSender += element.total;
                     }
+                    if (element.package_sub_status == "EXCEPTION_RETURNING") {
+                        returningToSender += element.total;
+                    }
                 })
-                setReturnTosenderTotal(returnToSender)
+                setReturnTosenderTotal(returnToSender);
+                setReturningToSenderTotal(returningToSender);
             }
             setTransportExceptionReasons(resp)
         }
@@ -227,6 +233,20 @@ const Dashboard: React.FC = () => {
                         <Text type="secondary">{(exceptionsTotal / statsticTotal * 100).toFixed(2)}% of total shipments</Text>
                     </Space>
                 </ProCard>
+
+                <ProCard
+                    title={<Text type="secondary">RETURNING TO SENDER</Text>}
+                    extra={<ULink to={{
+                        pathname: '/transport/v2/list',
+                        search: `?package_status=EXCEPTION&package_sub_status=EXCEPTION_RETURNING&begin_date=${analysisReq.begin_date.format(dateFormat)}&end_date=${analysisReq.end_date.format(dateFormat)}`,
+                    }}><RightOutlined /></ULink>}
+                >
+                    <Space direction='vertical'>
+                        <Text style={{ fontSize: 20 }}>{returningToSenderTotal}</Text>
+                        <Text type="secondary">{(returningToSenderTotal / statsticTotal * 100).toFixed(2)}% of total shipments</Text>
+                    </Space>
+                </ProCard>
+
                 <ProCard
                     title={<Text type="secondary">RETURNED TO SENDER</Text>}
                     extra={<ULink to={{
@@ -239,6 +259,7 @@ const Dashboard: React.FC = () => {
                         <Text type="secondary">{(returnToSenderTotal / statsticTotal * 100).toFixed(2)}% of total shipments</Text>
                     </Space>
                 </ProCard>
+
                 <ProCard
                     title={<Text type="secondary">DELIVERED</Text>}
                     extra={<ULink to={{

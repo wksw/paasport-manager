@@ -47,17 +47,6 @@ const Dashboard: React.FC = () => {
     const [statsticTotal, setStatsticTotal] = useState(0);
     const [exceptionsTotal, setExceptionsTotal] = useState(0);
     const [deliveredTotal, setDeliveredTotal] = useState(0);
-    // const [statstic, setStatstic] = useState({
-    //     total: 0,
-    //     exceptions: {
-    //         total: 0,
-    //         percent: 0.00
-    //     },
-    //     delivered: {
-    //         total: 0,
-    //         percent: 0.00
-    //     }
-    // });
     useEffect(() => {
         const getTransportStatusAnalysis = async () => {
             const resp = await TransportStatusAnalysis({
@@ -107,7 +96,7 @@ const Dashboard: React.FC = () => {
             if (resp.data) {
                 let returnToSender = 0
                 resp.data.forEach((element: any) => {
-                    if (element.package_sub_status == "EXCEPTION_RETURNING" || element.package_sub_status == "EXCEPTION_RETURNED") {
+                    if (element.package_sub_status == "EXCEPTION_RETURNED") {
                         returnToSender += element.total;
                     }
                 })
@@ -123,13 +112,15 @@ const Dashboard: React.FC = () => {
                 carrier: analysisReq.carrier,
                 provider: analysisReq.provider,
             })
-            resp.data.forEach(element => {
-                for (const v of carriers) {
-                    if (v.key == element.carrier) {
-                        element.carrier = v._name
+            if (resp.data) {
+                resp.data.forEach(element => {
+                    for (const v of carriers) {
+                        if (v.key == element.carrier) {
+                            element.carrier = v._name
+                        }
                     }
-                }
-            })
+                })
+            }
             setTransportExceptions(resp)
         }
         const getTransportOvertime = async () => {
@@ -175,7 +166,7 @@ const Dashboard: React.FC = () => {
         getTransportOvertime();
         getTransportCountWithCarrier();
         getTransportTrackStatus();
-    }, [])
+    }, [analysisReq])
     return (
         <PageContainer
             header={{
@@ -228,6 +219,7 @@ const Dashboard: React.FC = () => {
                     title={<Text type="secondary">EXCEPTION</Text>}
                     extra={<ULink to={{
                         pathname: '/transport/v2/list',
+                        search: `?package_status=EXCEPTION&begin_date=${analysisReq.begin_date.format(dateFormat)}&end_date=${analysisReq.end_date.format(dateFormat)}`,
                     }}><RightOutlined /></ULink>}
                 >
                     <Space direction='vertical'>
@@ -239,6 +231,7 @@ const Dashboard: React.FC = () => {
                     title={<Text type="secondary">RETURNED TO SENDER</Text>}
                     extra={<ULink to={{
                         pathname: '/transport/v2/list',
+                        search: `?package_status=EXCEPTION&package_sub_status=EXCEPTION_RETURNED&begin_date=${analysisReq.begin_date.format(dateFormat)}&end_date=${analysisReq.end_date.format(dateFormat)}`,
                     }}><RightOutlined /></ULink>}
                 >
                     <Space direction='vertical'>
@@ -250,6 +243,7 @@ const Dashboard: React.FC = () => {
                     title={<Text type="secondary">DELIVERED</Text>}
                     extra={<ULink to={{
                         pathname: '/transport/v2/list',
+                        search: `?package_status=DELIVERED&begin_date=${analysisReq.begin_date.format(dateFormat)}&end_date=${analysisReq.end_date.format(dateFormat)}`,
                     }}><RightOutlined /></ULink>}
                 >
                     <Space direction='vertical'>
@@ -299,6 +293,7 @@ const Dashboard: React.FC = () => {
                     extra={
                         <ULink to={{
                             pathname: '/transport/v2/list',
+                            search: `?begin_date=${analysisReq.begin_date.format(dateFormat)}&end_date=${analysisReq.end_date.format(dateFormat)}`,
                         }}>view detail</ULink>
                     }
                 >
@@ -314,6 +309,7 @@ const Dashboard: React.FC = () => {
                     title='Total shipments over time'
                     extra={<ULink to={{
                         pathname: '/transport/v2/list',
+                        search: `?begin_date=${analysisReq.begin_date.format(dateFormat)}&end_date=${analysisReq.end_date.format(dateFormat)}`,
                     }}>view detail</ULink>}
                 >
                     <Column

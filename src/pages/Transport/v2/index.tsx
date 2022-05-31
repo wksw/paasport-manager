@@ -6,15 +6,19 @@ import {
     DeleteTracks,
 } from '@/services/paasport/transport/v2/transport_v2_umirequest';
 import { packageStatusIcon, TransportDetail } from '@/components/Transport/v2';
-import { TransportPackageStatusEnumV2, TransportStatusEnumV2 } from '@/services/paasport';
+import { TransportPackageStatusEnumV2, TransportStatusEnumV2, TransportPackageSubStatusEnum } from '@/services/paasport';
 import { Button, Modal } from 'antd';
-import { getCarrier } from '@/utils/utils';
+import { getCarrierV2 } from '@/utils/utils';
 import { PageContainer } from '@ant-design/pro-layout';
-import { history } from 'umi';
+import carriers from '@/services/17track_carriers';
+import { history, useLocation } from 'umi';
 import moment from 'moment';
 import { PlusOutlined } from '@ant-design/icons';
 
-const Transport: React.FC = () => {
+const Transport: React.FC = (props) => {
+    const { location: { query } } = props;
+    const dateFormat = 'YYYY-MM-DD';
+    console.log('----query', query);
     const [detail, setDetail] = useState<TRANSPORT_V2.TrackInfo>({});
     const [transportVisible, setTransportVisible] = useState(false);
     const ref = useRef<ActionType>();
@@ -40,7 +44,16 @@ const Transport: React.FC = () => {
             title: '运输商',
             dataIndex: 'carrier',
             key: 'carrier',
-            render: (_, record) => [getCarrier(record)],
+            valueEnum: () => {
+                let carrierEnum = {}
+                carrierEnum['0'] = "所有";
+                carriers.forEach(element => {
+                    carrierEnum[element.key] = element._name
+                })
+                return carrierEnum
+            },
+            initialValue: query.carrier || '0',
+            render: (_, record) => [getCarrierV2(record)],
         },
         {
             title: '订单号',
@@ -62,16 +75,26 @@ const Transport: React.FC = () => {
             dataIndex: 'track_status',
             key: 'track_status',
             valueEnum: TransportStatusEnumV2,
+            initialValue: query.track_status || '',
         },
         {
             title: '包裹状态',
             dataIndex: 'package_status',
             key: 'package_status',
             valueEnum: TransportPackageStatusEnumV2,
+            initialValue: query.package_status || '',
             render: (_, record) => [
                 packageStatusIcon(record.package_status, 15),
-                <span> {TransportPackageStatusEnumV2[record.package_status]}</span>,
+                <span> {TransportPackageStatusEnumV2[record.package_status]} {TransportPackageSubStatusEnum[record.package_sub_status]}</span>,
             ],
+        },
+        {
+            title: '包裹子状态',
+            dataIndex: 'package_sub_status',
+            key: 'package_sub_status',
+            valueEnum: TransportPackageSubStatusEnum,
+            initialValue: query.package_sub_status || '',
+            hideInTable: true,
         },
         {
             title: '创建时间',
@@ -85,6 +108,7 @@ const Transport: React.FC = () => {
             valueType: 'dateRange',
             key: 'created_at_from_to',
             hideInTable: true,
+            initialValue: [query.begin_date || moment(moment().add(-30, "days"), dateFormat), query.end_date || moment(moment().add(1, "days"), dateFormat)],
         },
         {
             title: '更新时间',

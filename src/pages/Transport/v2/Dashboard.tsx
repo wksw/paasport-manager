@@ -50,11 +50,16 @@ const Dashboard: React.FC = () => {
         innerRadius: 0.55,
         label: {
             type: 'outer',
-            content: '{name} {percentage}'
+            offset: '30%',
+            content: '{name} {percentage}',
+            style: {
+                fontSize: 10,
+                textAlign: 'center'
+            }
         },
         interactions: [
             {
-                type: 'pie-legend-active',
+                type: 'element-selected',
             },
             {
                 type: 'element-active',

@@ -33,21 +33,68 @@ const Dashboard: React.FC = () => {
         carrier: 0,
         provider: -1,
     })
-    const [transportStatus, setTransportStatus] = useState({});
-    const [transportExceptions, setTransportExceptions] = useState({});
-    const [transportExceptionReasons, setTransportExceptionReasons] = useState({});
-    const [transportOverTime, setTransportOverTime] = useState([]);
-    const [transportWithCarrier, setTransportWithCarrier] = useState([]);
-    const [transportTrackStatus, setTransportTrackStatus] = useState([]);
+    // const [transportStatus, setTransportStatus] = useState({});
+    // const [transportExceptions, setTransportExceptions] = useState({});
+    // const [transportExceptionReasons, setTransportExceptionReasons] = useState({});
+    // const [transportOverTime, setTransportOverTime] = useState([]);
+    // const [transportWithCarrier, setTransportWithCarrier] = useState([]);
+    // const [transportTrackStatus, setTransportTrackStatus] = useState([]);
     const dateRangeConfig = {
         name: 'startEnd',
         format: dateFormat,
+    }
+    const pieConfig = {
+        data: [],
+        radius: 1,
+        innerRadius: 0.64,
+        meta: {
+            value: {
+                formatter: (v) => v,
+            }
+        }
     }
     const [returnToSenderTotal, setReturnTosenderTotal] = useState(0);
     const [returningToSenderTotal, setReturningToSenderTotal] = useState(0);
     const [statsticTotal, setStatsticTotal] = useState(0);
     const [exceptionsTotal, setExceptionsTotal] = useState(0);
     const [deliveredTotal, setDeliveredTotal] = useState(0);
+
+    const [trackStatusConfig, setTrackStatusConfig] = useState({
+        ...pieConfig,
+        angleField: 'total',
+        colorField: 'track_status'
+    })
+    const [transportExceptionsConfig, setTransportExceptionsConfig] = useState({
+        ...pieConfig,
+        angleField: 'total',
+        colorField: 'package_status'
+    })
+    const [transportExceptionReasonsConfig, setTransportExceptionReasonsConfig] = useState({
+        ...pieConfig,
+        angleField: 'total',
+        colorField: 'package_sub_status'
+    })
+    const [transportStatusConfig, setTransportStatusConfig] = useState({
+        ...pieConfig,
+        angleField: 'total',
+        colorField: 'package_status'
+    });
+    const [transportOverTimeConfig, setTransportOverTimeConfig] = useState({
+        data: [],
+        isStack: true,
+        xField: 'ref_date',
+        yField: 'total',
+        seriesField: 'package_status'
+
+    })
+    const [transportByCarrierConfig, setTransportByCarrierConfig] = useState({
+        data: [],
+        xField: 'total',
+        yField: 'carrier',
+        legend: {
+        }
+
+    })
     useEffect(() => {
         const getTransportStatusAnalysis = async () => {
             const resp = await TransportStatusAnalysis({
@@ -69,22 +116,13 @@ const Dashboard: React.FC = () => {
                     }
                 });
             }
-            // setStatstic({
-            //     ...statstic,
-            //     total: resp.total,
-            //     exceptions: {
-            //         total: exceptionTotal,
-            //         percent: (exceptionTotal / resp.total * 100).toFixed(2),
-            //     },
-            //     delivered: {
-            //         total: delivered,
-            //         percent: (delivered / resp.total * 100).toFixed(2)
-            //     }
-            // })
             setDeliveredTotal(delivered);
             setExceptionsTotal(exceptionTotal);
             setStatsticTotal(resp.total);
-            setTransportStatus(resp);
+            setTransportStatusConfig({
+                ...transportStatusConfig,
+                data: resp.data,
+            })
         }
         const getTransportExceptionReasons = async () => {
             const resp = await TransportExceptionReasonAnalysis({
@@ -108,7 +146,10 @@ const Dashboard: React.FC = () => {
                 setReturnTosenderTotal(returnToSender);
                 setReturningToSenderTotal(returningToSender);
             }
-            setTransportExceptionReasons(resp)
+            setTransportExceptionReasonsConfig({
+                ...transportExceptionReasonsConfig,
+                data: resp.data,
+            })
         }
         const getTransportExceptions = async () => {
             const resp = await TransportExceptionByCarrierAnalysis({
@@ -127,7 +168,10 @@ const Dashboard: React.FC = () => {
                     }
                 })
             }
-            setTransportExceptions(resp)
+            setTransportExceptionsConfig({
+                ...transportExceptionsConfig,
+                data: resp.data,
+            })
         }
         const getTransportOvertime = async () => {
             const resp = await TransportDeliveredAndNoDeliveredAnalysis({
@@ -137,7 +181,11 @@ const Dashboard: React.FC = () => {
                 carrier: analysisReq.carrier,
                 provider: analysisReq.provider,
             })
-            setTransportOverTime(resp.data)
+            // setTransportOverTime(resp.data)
+            setTransportOverTimeConfig({
+                ...transportOverTimeConfig,
+                data: resp.data,
+            })
         }
         const getTransportCountWithCarrier = async () => {
             const resp = await TransportCountWithCarrierAnalysis({
@@ -147,14 +195,20 @@ const Dashboard: React.FC = () => {
                 carrier: analysisReq.carrier,
                 provider: analysisReq.provider,
             })
-            resp.data.forEach(element => {
-                for (const v of carriers) {
-                    if (v.key == element.carrier) {
-                        element.carrier = v._name
+            if (resp.data) {
+                resp.data.forEach(element => {
+                    for (const v of carriers) {
+                        if (v.key == element.carrier) {
+                            element.carrier = v._name
+                        }
                     }
-                }
+                })
+            }
+            // setTransportWithCarrier(resp.data)
+            setTransportByCarrierConfig({
+                ...transportByCarrierConfig,
+                data: resp.data,
             })
-            setTransportWithCarrier(resp.data)
         }
         const getTransportTrackStatus = async () => {
             const resp = await TransportTrackStatusAnalysis({
@@ -164,7 +218,11 @@ const Dashboard: React.FC = () => {
                 carrier: analysisReq.carrier,
                 provider: analysisReq.provider,
             })
-            setTransportTrackStatus(resp.data);
+            // setTransportTrackStatus(resp.data);
+            setTrackStatusConfig({
+                ...trackStatusConfig,
+                data: resp.data,
+            })
         }
         getTransportStatusAnalysis();
         getTransportExceptionReasons();
@@ -273,34 +331,12 @@ const Dashboard: React.FC = () => {
                 <ProCard
                     title='Total track status'
                 >
-                    <Pie
-                        data={transportTrackStatus}
-                        angleField='total'
-                        colorField='track_status'
-                        radius={1}
-                        innerRadius={0.64}
-                        meta={{
-                            value: {
-                                formatter: (v) => v,
-                            }
-                        }}
-                    />
+                    <Pie {...trackStatusConfig} />
                 </ProCard>
                 <ProCard
                     title='Total shipments by status'
                 >
-                    <Pie
-                        data={transportStatus?.data || []}
-                        angleField='total'
-                        colorField='package_status'
-                        radius={1}
-                        innerRadius={0.64}
-                        meta={{
-                            value: {
-                                formatter: (v) => v,
-                            }
-                        }}
-                    />
+                    <Pie {...transportStatusConfig} />
                 </ProCard>
             </ProCard>
 
@@ -314,13 +350,7 @@ const Dashboard: React.FC = () => {
                         }}>view detail</ULink>
                     }
                 >
-                    <Bar
-                        data={transportWithCarrier}
-                        xField='total'
-                        yField='carrier'
-                        legend={{
-                        }}
-                    />
+                    <Bar {...transportByCarrierConfig} />
                 </ProCard>
                 <ProCard
                     title='Total shipments over time'
@@ -329,47 +359,19 @@ const Dashboard: React.FC = () => {
                         search: `?begin_date=${analysisReq.begin_date.format(dateFormat)}&end_date=${analysisReq.end_date.format(dateFormat)}`,
                     }}>view detail</ULink>}
                 >
-                    <Column
-                        data={transportOverTime}
-                        isStack={true}
-                        xField='ref_date'
-                        yField='total'
-                        seriesField='package_status'
-                    />
+                    <Column {...transportOverTimeConfig} />
                 </ProCard>
             </ProCard>
             <ProCard ghost gutter={8} style={{ marginTop: 16 }}>
                 <ProCard
                     title='Exception shipments by reasons'
                 >
-                    <Pie
-                        data={transportExceptionReasons?.data || []}
-                        angleField='total'
-                        colorField='package_sub_status'
-                        radius={1}
-                        innerRadius={0.64}
-                        meta={{
-                            value: {
-                                formatter: (v) => v,
-                            }
-                        }}
-                    />
+                    <Pie {...transportExceptionReasonsConfig} />
                 </ProCard>
                 <ProCard
                     title='Exception shipments by carrier'
                 >
-                    <Pie
-                        data={transportExceptions?.data || []}
-                        angleField='total'
-                        colorField='carrier'
-                        radius={1}
-                        innerRadius={0.64}
-                        meta={{
-                            value: {
-                                formatter: (v) => v,
-                            }
-                        }}
-                    />
+                    <Pie {...transportExceptionsConfig} />
                 </ProCard>
             </ProCard>
         </>

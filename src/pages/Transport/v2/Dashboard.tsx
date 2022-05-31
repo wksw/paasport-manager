@@ -45,8 +45,21 @@ const Dashboard: React.FC = () => {
     }
     const pieConfig = {
         data: [],
-        radius: 1,
-        innerRadius: 0.64,
+        hasLegend: true,
+        radius: 0.80,
+        innerRadius: 0.55,
+        label: {
+            type: 'outer',
+            content: '{name} {percentage}'
+        },
+        interactions: [
+            {
+                type: 'pie-legend-active',
+            },
+            {
+                type: 'element-active',
+            },
+        ],
         meta: {
             value: {
                 formatter: (v) => v,
@@ -91,9 +104,9 @@ const Dashboard: React.FC = () => {
         data: [],
         xField: 'total',
         yField: 'carrier',
-        legend: {
-        }
-
+        legend: false,
+        maxBarWidth: 20,
+        minBarWidth: 10,
     })
     useEffect(() => {
         const getTransportStatusAnalysis = async () => {

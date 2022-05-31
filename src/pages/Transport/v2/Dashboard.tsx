@@ -174,11 +174,7 @@ const Dashboard: React.FC = () => {
         getTransportTrackStatus();
     }, [analysisReq])
     return (
-        <PageContainer
-            header={{
-                title: ''
-            }}
-        >
+        <>
             <ProCard >
                 <ProForm layout='inline'
                     autoFocusFirstInput={false}
@@ -376,7 +372,7 @@ const Dashboard: React.FC = () => {
                     />
                 </ProCard>
             </ProCard>
-        </PageContainer >
+        </>
     )
 }
 

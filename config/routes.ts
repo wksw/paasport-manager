@@ -1,7 +1,9 @@
-﻿export default [
+﻿
+export default [
   {
     path: '/account',
     name: '账户',
+    icon: 'user',
     routes: [
       {
         path: '/account/list',
@@ -31,6 +33,7 @@
   {
     path: '/message',
     name: '消息',
+    icon: 'message',
     routes: [
       {
         path: '/message/list',
@@ -47,6 +50,7 @@
   {
     path: '/audit',
     name: '审计',
+    icon: 'audit',
     component: './Audits',
   },
   {
@@ -66,14 +70,17 @@
   {
     path: '/protocol',
     name: '协议',
+    icon: 'fileText',
     component: './Protocol',
   },
   {
     path: '/transport',
     name: '物流',
+    icon: 'shopping',
     routes: [
       {
         path: '/transport/dashboard',
+        icon: 'dashboard',
         name: '看板',
         component: './Transport/v2/Dashboard',
       },

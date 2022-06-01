@@ -1,8 +1,9 @@
 import moment from "moment";
 
 export type AnalysisReq = {
-    start_at?: moment.Moment;
-    end_at?: moment.Moment;
+    begin_date?: moment.Moment;
+    end_date?: moment.Moment;
     app_id?: string;
     carrier?: string | number;
+    provider?: number;
 }

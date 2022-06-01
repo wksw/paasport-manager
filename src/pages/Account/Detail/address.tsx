@@ -1,6 +1,6 @@
 import ProTable, { ProColumns } from '@ant-design/pro-table';
 import React from 'react';
-import { GetAddresses } from '@/services/paasport/account/address/address_umirequest';
+import { GetAddresses } from '@/services/paasport/account/address/v2/address_v2_umirequest';
 
 const AccountAddress: React.FC<COMMON.ReqWithUid> = (props) => {
   const { uid } = props;
@@ -72,7 +72,7 @@ const AccountAddress: React.FC<COMMON.ReqWithUid> = (props) => {
     },
   ];
   return (
-    <ProTable<ACCOUNT.AccountAddress, ACCOUNT.ReqWithSearchPage>
+    <ProTable<ACCOUNT.AccountAddress, ACCOUNT_V2.ReqWithSearchPage>
       columns={columns}
       search={false}
       toolBarRender={false}

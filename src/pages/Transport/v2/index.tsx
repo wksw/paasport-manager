@@ -127,6 +127,19 @@ const Transport: React.FC = (props) => {
             },
         },
         {
+            title: '妥投时效(天)',
+            dataIndex: 'days_of_transit_done',
+            key: 'days_of_transit_done',
+            align: 'center',
+            valueType: 'text',
+            renderText: (_, record: TRANSPORT_V2.TrackInfo) => {
+                if (record.package_status == 'DELIVERED') {
+                    return record?.track?.metrics.days_of_transit_done || ''
+                }
+                return ''
+            }
+        },
+        {
             title: '创建时间',
             dataIndex: 'created_at',
             valueType: 'dateTime',

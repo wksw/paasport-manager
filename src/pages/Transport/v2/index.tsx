@@ -97,6 +97,36 @@ const Transport: React.FC = (props) => {
             hideInTable: true,
         },
         {
+            title: '行程',
+            dataIndex: 'track',
+            key: 'track',
+            valueType: 'text',
+            renderText: (_, record: TRANSPORT_V2.TrackInfo) => {
+                console.log('----reocrd', record);
+                if (record.package_status == 'DELIVERED') {
+                    let route = '';
+                    if (record.track.departure.country != '') {
+                        route = record.track.departure.country
+                    } else {
+                        route = `Unknown`
+                    }
+                    if (record.track.departure.state != '') {
+                        route = `${route}(${record.track.departure.state})`;
+                    }
+                    if (record.track.destination.country != '') {
+                        route = `${route}->${record.track.destination.country}`;
+                    } else {
+                        route = `${route}->Unknown`
+                    }
+                    if (record.track.destination.state != '') {
+                        route = `${route}(${record.track.destination.state})`;
+                    }
+                    return route;
+                }
+                return ''
+            },
+        },
+        {
             title: '创建时间',
             dataIndex: 'created_at',
             valueType: 'dateTime',

@@ -1,14 +1,14 @@
 import React, { useEffect, useState } from 'react';
 import ProCard from '@ant-design/pro-card';
 import moment from 'moment';
-import { Button, Card, Col, Collapse, Divider, Row, Tabs, Tooltip } from 'antd';
+import { Button, Card, Col, Collapse, Divider, Radio, RadioChangeEvent, Row, Tabs, Tooltip } from 'antd';
 import ProForm, { ProFormDateRangePicker } from '@ant-design/pro-form';
 import {
     TransportStatusAnalysis, TransportExceptionReasonAnalysis,
     TransportExceptionByCarrierAnalysis, TransportDeliveredAndNoDeliveredAnalysis,
     TransportCountWithCarrierAnalysis, TransportTrackStatusAnalysis,
     TransportTransitAnalysis, TransportTransitAvgTimeAnalysis, TransportTransitP85TimeAnalysis,
-    TransportTransitByCarrierAnalysis
+    TransportTransitByCarrierAnalysis, TransportTransitByLaneAnalysis
 } from '@/services/paasport/transport/v2/transport_v2_umirequest';
 import { Space, Typography } from 'antd';
 import { RightOutlined } from '@ant-design/icons';
@@ -32,7 +32,14 @@ const Dashboard: React.FC = () => {
         app_id: '0',
         carrier: 0,
         provider: -1,
+        lane: 0,
     })
+    const onLaneChanged = ({ target: { value } }: RadioChangeEvent) => {
+        setAnalysisReq({
+            ...analysisReq,
+            lane: value
+        })
+    }
     const [durationDays, setDurationDays] = useState(0);
     const dateRangeConfig = {
         name: 'startEnd',
@@ -158,6 +165,7 @@ const Dashboard: React.FC = () => {
     })
 
     const [transitByCarrier, setTransitByCarrier] = useState([]);
+    const [transitByLane, setTransitByLane] = useState([]);
     useEffect(() => {
         const getTransportStatusAnalysis = async () => {
             const resp = await TransportStatusAnalysis({
@@ -368,6 +376,17 @@ const Dashboard: React.FC = () => {
             })
             setTransitByCarrier(resp.data)
         }
+        const getTransitByLane = async () => {
+            const resp = await TransportTransitByLaneAnalysis({
+                begin_date: analysisReq.begin_date?.format(rfc3339),
+                end_date: analysisReq.end_date?.format(rfc3339),
+                app_id: analysisReq.app_id,
+                carrier: analysisReq.carrier,
+                provider: analysisReq.provider,
+                lane: analysisReq.lane,
+            })
+            setTransitByLane(resp.data)
+        }
         getTransportStatusAnalysis();
         getTransportExceptionReasons();
         getTransportExceptions();
@@ -379,6 +398,7 @@ const Dashboard: React.FC = () => {
         getTransitTime();
         setDurationDays(analysisReq.end_date.diff(analysisReq.begin_date, "days") - 1);
         getTransitByCarrier();
+        getTransitByLane();
     }, [analysisReq])
     return (
         <>
@@ -611,6 +631,74 @@ const Dashboard: React.FC = () => {
                     <>
                         <Row gutter={5}>
                             <Col span={6}><Row align='middle' >{getCarrierText(item.carrier)}</Row></Col>
+                            <Col span={6}><Row justify='center'>{item.delivered}</Row></Col>
+                            <Col span={6}>
+                                <Row>
+                                    <Col span={6}>{item.p85}</Col>
+                                    <Col span={6}>{item.avg}</Col>
+                                    <Col span={6}>{item.min}</Col>
+                                    <Col span={6}>{item.max}</Col>
+                                </Row>
+                            </Col>
+                            <Col span={6}>
+                                <Row >
+                                    <Col span={4}>{(item.distribution["0-3"] / item.total * 100).toFixed(0)}%</Col>
+                                    <Col span={4}>{(item.distribution["4-7"] / item.total * 100).toFixed(0)}%</Col>
+                                    <Col span={4}>{(item.distribution["8-11"] / item.total * 100).toFixed(0)}%</Col>
+                                    <Col span={4}>{(item.distribution["12-15"] / item.total * 100).toFixed(0)}%</Col>
+                                    <Col span={4}>{(item.distribution["16-30"] / item.total * 100).toFixed(0)}%</Col>
+                                    <Col span={4}>{(item.distribution["30+"] / item.total * 100).toFixed(0)}%</Col>
+                                </Row>
+                            </Col>
+                        </Row>
+                        <Divider type='horizontal' />
+                    </>))}
+            </ProCard >
+
+            {/* 运输路线分析 */}
+            <ProCard hoverable title='Transit time by lane' style={{ marginTop: 16 }}>
+                <Radio.Group
+                    options={[{
+                        label: 'By State',
+                        value: 0,
+                    }, {
+                        label: 'By Country',
+                        value: 1,
+                    }]}
+                    value={analysisReq.lane}
+                    onChange={onLaneChanged}
+                    optionType='button'
+                    buttonStyle='outline'
+                />
+                <Row gutter={5}>
+                    <Col span={6}><Row align='middle' style={{ marginTop: 12 }}>Lane</Row></Col>
+                    <Col span={6}><Row justify='center' style={{ marginTop: 12 }}>Delivered shipments</Row></Col>
+                    <Col span={6}>
+                        <Row justify='center'>Transit time(d)</Row>
+                        <Row style={{ marginTop: 5 }}>
+                            <Col span={6}><Tooltip title='round up'><Text underline>P85</Text></Tooltip></Col>
+                            <Col span={6}><Tooltip title='round up'><Text underline>Avg</Text></Tooltip></Col>
+                            <Col span={6} >Min</Col>
+                            <Col span={6}>Max</Col>
+                        </Row>
+                    </Col>
+                    <Col span={6}>
+                        <Row justify='center'>Transit time distribution(%)</Row>
+                        <Row style={{ marginTop: 5 }}>
+                            <Col span={4}>0-3d</Col>
+                            <Col span={4}>4-7d</Col>
+                            <Col span={4}>8-11d</Col>
+                            <Col span={4}>12-15d</Col>
+                            <Col span={4}>16-30d</Col>
+                            <Col span={4}>30+d</Col>
+                        </Row>
+                    </Col>
+                </Row>
+                <Divider type='horizontal' />
+                {transitByLane?.map((item: TRANSPORT_V2.TransportTransitByLaneResp_Data) => (
+                    <>
+                        <Row gutter={5}>
+                            <Col span={6}><Row align='middle' >{item.lane}</Row></Col>
                             <Col span={6}><Row justify='center'>{item.delivered}</Row></Col>
                             <Col span={6}>
                                 <Row>

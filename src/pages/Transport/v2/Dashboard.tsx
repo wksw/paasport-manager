@@ -28,7 +28,7 @@ const Dashboard: React.FC = () => {
     const rfc3339 = 'YYYY-MM-DDTHH:mm:ssZ';
     const [analysisReq, setAnalysisReq] = useState({
         begin_date: moment(moment().add(-30, "days"), dateFormat),
-        end_date: moment(moment().add(1, "days"), dateFormat),
+        end_date: moment(moment().add(1, 'days'), dateFormat),
         app_id: '0',
         carrier: 0,
         provider: -1,
@@ -72,7 +72,7 @@ const Dashboard: React.FC = () => {
     const [statsticTotal, setStatsticTotal] = useState(0);
     const [exceptionsTotal, setExceptionsTotal] = useState(0);
     const [deliveredTotal, setDeliveredTotal] = useState(0);
-    const [shipmentsShow, setShipmentsShow] = useState(true);
+    // const [shipmentsShow, setShipmentsShow] = useState(true);
     // const [TransitTimeShow, setTransitTimeShow] = useState(true);
 
     const [trackStatusConfig, setTrackStatusConfig] = useState({
@@ -422,6 +422,7 @@ const Dashboard: React.FC = () => {
                     title={<Text type="secondary">Total</Text>}
                     extra={<ULink to={{
                         pathname: '/transport/v2/list',
+                        search: `?begin_date=${analysisReq.begin_date.format(dateFormat)}&end_date=${analysisReq.end_date.format(dateFormat)}`
                     }}><RightOutlined /></ULink>}
                 >
                     <Space direction='vertical'>

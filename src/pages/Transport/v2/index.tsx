@@ -189,7 +189,7 @@ const Transport: React.FC = (props) => {
                         number: params.number,
                         carrier: params.carrier,
                         order_id: params.order_id,
-                        track_status: params.status || -1,
+                        track_status: params.track_status || -1,
                         package_status: params.package_status || -1,
                         package_sub_status: params.package_sub_status || -1,
                         page: params.current,

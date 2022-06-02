@@ -203,9 +203,9 @@ const Dashboard: React.FC = () => {
                 carrier: analysisReq.carrier,
                 provider: analysisReq.provider,
             })
+            let returnToSender = 0;
+            let returningToSender = 0;
             if (resp.data) {
-                let returnToSender = 0;
-                let returningToSender = 0;
                 resp.data.forEach((element: any) => {
                     if (element.package_sub_status == "EXCEPTION_RETURNED") {
                         returnToSender += element.total;
@@ -214,9 +214,9 @@ const Dashboard: React.FC = () => {
                         returningToSender += element.total;
                     }
                 })
-                setReturnTosenderTotal(returnToSender);
-                setReturningToSenderTotal(returningToSender);
             }
+            setReturnTosenderTotal(returnToSender);
+            setReturningToSenderTotal(returningToSender);
             setTransportExceptionReasonsConfig({
                 ...transportExceptionReasonsConfig,
                 data: resp.data,
@@ -360,7 +360,6 @@ const Dashboard: React.FC = () => {
                     total: distribution[i],
                 })
             }
-            console.log('--------data=', data)
             setTransitTimeDistribution({
                 ...transitTimeDistribution,
                 data: data,

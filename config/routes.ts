@@ -4,10 +4,12 @@ export default [
     path: '/account',
     name: '账户',
     icon: 'user',
+    access: 'accountAllPermission',
     routes: [
       {
         path: '/account/list',
         name: '账户列表',
+        access: 'searchAccountPermission',
         component: './Account/List',
         routes: [],
       },
@@ -15,17 +17,20 @@ export default [
         path: '/account/:uid/detail',
         name: '详情',
         hideInMenu: true,
+        access: 'getAccountAllPermission',
         component: './Account/Detail',
       },
       {
         path: '/account/sync',
         name: '同步',
+        access: 'accountSyncAllPermission',
         component: './Account/Sync',
       },
       {
         path: '/account/:uid/info',
         name: '信息',
         hideInMenu: true,
+        access: 'getAccountAllPermission',
         component: './Account/Info',
       },
     ],
@@ -34,15 +39,18 @@ export default [
     path: '/message',
     name: '消息',
     icon: 'message',
+    access: 'messageAllPermission',
     routes: [
       {
         path: '/message/list',
         name: '消息列表',
+        access: 'messageAllPermission',
         component: './Message',
       },
       {
         path: '/message/template',
         name: '模版',
+        access: 'messageTemplateAllPermission',
         component: './Message/Template',
       },
     ],
@@ -51,15 +59,18 @@ export default [
     path: '/audit',
     name: '审计',
     icon: 'audit',
+    access: 'auditAllPermission',
     component: './Audits',
   },
   {
     path: '/login',
     layout: false,
+    access: 'public',
     routes: [
       {
         name: 'login',
         path: '/login',
+        access: 'public',
         component: './Account/Login',
       },
       {
@@ -71,16 +82,19 @@ export default [
     path: '/protocol',
     name: '协议',
     icon: 'fileText',
+    access: 'protocolAllPermission',
     component: './Protocol',
   },
   {
     path: '/transport',
     name: '物流',
     icon: 'shopping',
+    access: 'transportAllPermission',
     routes: [
       {
         path: '/transport/dashboard',
         icon: 'dashboard',
+        access: 'transportAnalsysisPermission',
         name: '看板',
         component: './Transport/v2/Dashboard',
       },
@@ -88,11 +102,13 @@ export default [
         path: '/transport/list',
         name: '物流追踪',
         hideInMenu: true,
+        access: 'searchTransportPermission',
         component: './Transport',
       },
       {
         path: '/transport/v2/list',
         name: '物流追踪',
+        access: 'searchTransportPermission',
         component: './Transport/v2',
       },
       {
@@ -101,6 +117,7 @@ export default [
         layout: false,
         hideInMenu: true,
         component: './Transport/Track',
+        access: 'public'
       },
       {
         path: '/transport/v2/track',
@@ -108,11 +125,13 @@ export default [
         layout: false,
         hideInMenu: true,
         component: './Transport/v2/Track',
+        access: 'public'
       },
     ],
   },
   {
     path: '/',
+    access: 'public',
     redirect: '/account/list',
   },
   {

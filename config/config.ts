@@ -34,6 +34,9 @@ export default defineConfig({
   targets: {
     ie: 11,
   },
+  access: {
+    strictMode: true,
+  },
   // umi routes: https://umijs.org/docs/routing
   routes,
   // Theme for antd: https://ant.design/docs/react/customize-theme-cn

@@ -14,7 +14,7 @@ import { GetResourceBindRoles as GetAccountRoles } from '@/services/paasport/aut
 import defaultSettings from '../config/defaultSettings';
 // import defineConfig from '../config/config';
 import { Get as GetStorage } from './storage/storage';
-import { message } from 'antd';
+import { Button, message, Result } from 'antd';
 
 // const isDev = process.env.NODE_ENV === 'development';
 const loginPath = '/login';
@@ -94,7 +94,16 @@ export const layout: RunTimeLayoutConfig = ({ initialState, setInitialState }) =
     //   : [],
     menuHeaderRender: undefined,
     // 自定义 403 页面
-    // unAccessible: <div>unAccessible</div>,
+    unAccessible: <Result
+      status="403"
+      title="403"
+      subTitle="Sorry, you have no permission to access this page."
+      extra={
+        <Button type="primary" onClick={() => history.push('/')}>
+          Back Home
+        </Button>
+      }
+    />,
     // 增加一个 loading 的状态
     childrenRender: (children, props) => {
       // if (initialState?.loading) return <PageLoading />;

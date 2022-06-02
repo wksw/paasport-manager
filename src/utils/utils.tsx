@@ -86,6 +86,15 @@ export function getCarrierV2(detail: TRANSPORT_V2.TrackInfo) {
   return <p>-</p>;
 }
 
+export function getCarrierText(carrier: any) {
+  for (const v of carriers) {
+    if (v.key == carrier) {
+      carrier = v._name
+    }
+  }
+  return carrier;
+}
+
 function getCarrierStatus(status: number) {
   switch (status) {
     case 0:

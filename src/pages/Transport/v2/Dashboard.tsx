@@ -18,6 +18,7 @@ const { Text } = Typography
 import { Pie } from '@ant-design/plots';
 import { Bar } from '@ant-design/plots';
 import carriers from '@/services/17track_carriers';
+import { getCarrierText } from '@/utils/utils';
 
 // const { Panel } = Collapse;
 
@@ -618,11 +619,7 @@ const Dashboard: React.FC = () => {
                 {transitByCarrier?.map((item: TRANSPORT_V2.TransportTransitByCarrierResp_Data) => (
                     <>
                         <Row gutter={5}>
-                            <Col span={6}><Row align='middle' >{carriers.map((carrier: any) => {
-                                if (carrier.key == item.carrier) {
-                                    return carrier._name
-                                }
-                            }) || 'Unknown'}</Row></Col>
+                            <Col span={6}><Row align='middle' >{getCarrierText(item.carrier)}</Row></Col>
                             <Col span={6}><Row justify='center'>{item.delivered}</Row></Col>
                             <Col span={6}>
                                 <Row>

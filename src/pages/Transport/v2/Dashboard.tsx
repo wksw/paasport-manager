@@ -260,17 +260,7 @@ const Dashboard: React.FC = () => {
             })
             if (resp.data) {
                 resp.data.forEach(element => {
-                    let exist = false
-                    for (const v of carriers) {
-                        if (v.key == element.carrier) {
-                            element.carrier = v._name;
-                            exist = true;
-                            break
-                        }
-                    }
-                    if (!exist) {
-                        element.carrier = 'Unknown';
-                    }
+                    element.carrier = getCarrierText(element.carrier);
                 })
             }
             // setTransportWithCarrier(resp.data)

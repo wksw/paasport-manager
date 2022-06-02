@@ -1,15 +1,5 @@
 export default [
   {
-    key: 0,
-    _country: 0,
-    _country_iso: '',
-    _url: '',
-    _name: 'Unknown',
-    '_name_zh-cn': 'Unknown',
-    '_name_zh-hk': 'Unknown',
-    _group: '12',
-  },
-  {
     key: 190135,
     _country: 0,
     _country_iso: '',

@@ -1,13 +1,14 @@
 import React, { useEffect, useState } from 'react';
 import ProCard from '@ant-design/pro-card';
 import moment from 'moment';
-import { Button, Card, Collapse, Tabs } from 'antd';
+import { Button, Card, Col, Collapse, Divider, Row, Tabs, Tooltip } from 'antd';
 import ProForm, { ProFormDateRangePicker } from '@ant-design/pro-form';
 import {
     TransportStatusAnalysis, TransportExceptionReasonAnalysis,
     TransportExceptionByCarrierAnalysis, TransportDeliveredAndNoDeliveredAnalysis,
     TransportCountWithCarrierAnalysis, TransportTrackStatusAnalysis,
-    TransportTransitAnalysis, TransportTransitAvgTimeAnalysis, TransportTransitP85TimeAnalysis
+    TransportTransitAnalysis, TransportTransitAvgTimeAnalysis, TransportTransitP85TimeAnalysis,
+    TransportTransitByCarrierAnalysis
 } from '@/services/paasport/transport/v2/transport_v2_umirequest';
 import { Space, Typography } from 'antd';
 import { RightOutlined } from '@ant-design/icons';
@@ -18,7 +19,7 @@ import { Pie } from '@ant-design/plots';
 import { Bar } from '@ant-design/plots';
 import carriers from '@/services/17track_carriers';
 
-const { Panel } = Collapse;
+// const { Panel } = Collapse;
 
 
 const Dashboard: React.FC = () => {
@@ -62,14 +63,15 @@ const Dashboard: React.FC = () => {
             value: {
                 formatter: (v) => v,
             }
-        }
+        },
+        height: 300,
     }
     const [returnToSenderTotal, setReturnTosenderTotal] = useState(0);
     const [returningToSenderTotal, setReturningToSenderTotal] = useState(0);
     const [statsticTotal, setStatsticTotal] = useState(0);
     const [exceptionsTotal, setExceptionsTotal] = useState(0);
     const [deliveredTotal, setDeliveredTotal] = useState(0);
-    // const [shipmentsShow, setShipmentsShow] = useState(true);
+    const [shipmentsShow, setShipmentsShow] = useState(true);
     // const [TransitTimeShow, setTransitTimeShow] = useState(true);
 
     const [trackStatusConfig, setTrackStatusConfig] = useState({
@@ -97,7 +99,8 @@ const Dashboard: React.FC = () => {
         isStack: true,
         xField: 'ref_date',
         yField: 'total',
-        seriesField: 'package_status'
+        seriesField: 'package_status',
+        height: 300
 
     })
     const [transitLastP85Time, setTransitLastP85Time] = useState(0);
@@ -105,14 +108,14 @@ const Dashboard: React.FC = () => {
         data: [],
         xField: 'ref_date',
         yField: 'days_of_transit_done',
-        height: 300
+        height: 200
     })
     const [transitLastAvgTime, setTransitLastAvgTime] = useState(0);
     const [transitAvgTime, settransitAvgTime] = useState({
         data: [],
         xField: 'ref_date',
         yField: 'days_of_transit_done',
-        height: 300
+        height: 200
     })
     const [transitTimeDistribution, setTransitTimeDistribution] = useState({
         ...pieConfig,
@@ -134,10 +137,14 @@ const Dashboard: React.FC = () => {
         },
         tooltip: {
             formatter: (datum: any) => {
-                console.log('---datum=', datum);
                 return { name: datum.days_of_transit_done + ' days', value: datum.total }
             }
         },
+        statistic: {
+            content: false,
+            title: false,
+        },
+        height: 300
     })
     const [transportByCarrierConfig, setTransportByCarrierConfig] = useState({
         data: [],
@@ -146,7 +153,10 @@ const Dashboard: React.FC = () => {
         legend: false,
         maxBarWidth: 20,
         minBarWidth: 10,
+        height: 300
     })
+
+    const [transitByCarrier, setTransitByCarrier] = useState([]);
     useEffect(() => {
         const getTransportStatusAnalysis = async () => {
             const resp = await TransportStatusAnalysis({
@@ -249,10 +259,16 @@ const Dashboard: React.FC = () => {
             })
             if (resp.data) {
                 resp.data.forEach(element => {
+                    let exist = false
                     for (const v of carriers) {
                         if (v.key == element.carrier) {
-                            element.carrier = v._name
+                            element.carrier = v._name;
+                            exist = true;
+                            break
                         }
+                    }
+                    if (!exist) {
+                        element.carrier = 'Unknown';
                     }
                 })
             }
@@ -327,6 +343,14 @@ const Dashboard: React.FC = () => {
                         distribution['0-3'] += element.total
                     } else if (element.days_of_transit_done >= 4 && element.days_of_transit_done <= 7) {
                         distribution['4-7'] += element.total
+                    } else if (element.days_of_transit_done >= 8 && element.days_of_transit_done <= 11) {
+                        distribution['8-11'] += element.total
+                    } else if (element.days_of_transit_done >= 12 && element.days_of_transit_done <= 15) {
+                        distribution['12-15'] += element.total
+                    } else if (element.days_of_transit_done >= 16 && element.days_of_transit_done <= 30) {
+                        distribution['16-30'] += element.total
+                    } else {
+                        distribution['30+'] += element.total
                     }
                 })
             }
@@ -343,6 +367,16 @@ const Dashboard: React.FC = () => {
                 data: data,
             })
         }
+        const getTransitByCarrier = async () => {
+            const resp = await TransportTransitByCarrierAnalysis({
+                begin_date: analysisReq.begin_date?.format(rfc3339),
+                end_date: analysisReq.end_date?.format(rfc3339),
+                app_id: analysisReq.app_id,
+                carrier: analysisReq.carrier,
+                provider: analysisReq.provider,
+            })
+            setTransitByCarrier(resp.data)
+        }
         getTransportStatusAnalysis();
         getTransportExceptionReasons();
         getTransportExceptions();
@@ -352,7 +386,8 @@ const Dashboard: React.FC = () => {
         getTransitAvgTime();
         getTransitP85Time();
         getTransitTime();
-        setDurationDays(analysisReq.end_date.diff(analysisReq.begin_date, "days") - 1)
+        setDurationDays(analysisReq.end_date.diff(analysisReq.begin_date, "days") - 1);
+        getTransitByCarrier();
     }, [analysisReq])
     return (
         <>
@@ -388,6 +423,7 @@ const Dashboard: React.FC = () => {
                 </ProForm>
             </ProCard>
 
+            <ProCard title='Shipments' style={{ marginTop: 16 }} bodyStyle={{ height: 0, padding: '8px' }}></ProCard>
             {/* 数量统计 */}
             <ProCard ghost gutter={8} style={{ marginTop: 16 }} size='default'>
                 <ProCard
@@ -516,11 +552,13 @@ const Dashboard: React.FC = () => {
                     <Pie {...transportExceptionsConfig} />
                 </ProCard>
             </ProCard>
+            <ProCard title='Transit time' style={{ marginTop: 16 }} bodyStyle={{ height: 0, padding: '8px' }}></ProCard>
             {/* 运输时长 */}
             <ProCard ghost gutter={8} style={{ marginTop: 16 }}>
                 <ProCard
-                    title="P85 transit time(d)"
-                    style={{ height: 500 }}
+                    hoverable
+                    title={<Typography.Title level={5}>P85 transit time(d)<Text type='secondary' style={{ fontSize: 4 }}> round up</Text></Typography.Title>}
+                    // style={{ height: 500 }}
                     colSpan={6}
                 >
                     <Space direction='vertical'>
@@ -530,8 +568,17 @@ const Dashboard: React.FC = () => {
                     <Column {...transitP85Time} style={{ marginTop: 15 }}></Column>
                 </ProCard>
                 <ProCard
-                    title="Avg. transit time(d)"
-                    style={{ height: 500 }}
+                    hoverable
+                    title='Transit time distribution'
+                    // style={{ height: 500 }}
+                    colSpan={12}
+                >
+                    <Pie {...transitTimeDistribution}></Pie>
+                </ProCard>
+                <ProCard
+                    hoverable
+                    title={<Typography.Title level={5}>AVG. transit time(d)<Text type='secondary' style={{ fontSize: 4 }}> round up</Text></Typography.Title>}
+                    // style={{ height: 500 }}
                     colSpan={6}
                 >
                     <Space direction='vertical'>
@@ -540,15 +587,65 @@ const Dashboard: React.FC = () => {
                     </Space>
                     <Column {...transitAvgTime} style={{ marginTop: 15 }}></Column>
                 </ProCard>
-                <ProCard
-                    title='Transit time distribution'
-                    style={{ height: 500 }}
-                    colSpan={12}
-                >
-                    <Pie {...transitTimeDistribution}></Pie>
-                </ProCard>
             </ProCard>
-
+            {/* 运输商分析 */}
+            <ProCard hoverable title='Transit time by carrier' style={{ marginTop: 16 }}>
+                <Row gutter={5}>
+                    <Col span={6}><Row align='middle' style={{ marginTop: 12 }}>Carrier</Row></Col>
+                    <Col span={6}><Row justify='center' style={{ marginTop: 12 }}>Delivered shipments</Row></Col>
+                    <Col span={6}>
+                        <Row justify='center'>Transit time(d)</Row>
+                        <Row style={{ marginTop: 5 }}>
+                            <Col span={6}><Tooltip title='round up'><Text underline>P85</Text></Tooltip></Col>
+                            <Col span={6}><Tooltip title='round up'><Text underline>Avg</Text></Tooltip></Col>
+                            <Col span={6} >Min</Col>
+                            <Col span={6}>Max</Col>
+                        </Row>
+                    </Col>
+                    <Col span={6}>
+                        <Row justify='center'>Transit time distribution(%)</Row>
+                        <Row style={{ marginTop: 5 }}>
+                            <Col span={4}>0-3d</Col>
+                            <Col span={4}>4-7d</Col>
+                            <Col span={4}>8-11d</Col>
+                            <Col span={4}>12-15d</Col>
+                            <Col span={4}>16-30d</Col>
+                            <Col span={4}>30+d</Col>
+                        </Row>
+                    </Col>
+                </Row>
+                <Divider type='horizontal' />
+                {transitByCarrier?.map((item: TRANSPORT_V2.TransportTransitByCarrierResp_Data) => (
+                    <>
+                        <Row gutter={5}>
+                            <Col span={6}><Row align='middle' >{carriers.map((carrier: any) => {
+                                if (carrier.key == item.carrier) {
+                                    return carrier._name
+                                }
+                            }) || 'Unknown'}</Row></Col>
+                            <Col span={6}><Row justify='center'>{item.delivered}</Row></Col>
+                            <Col span={6}>
+                                <Row>
+                                    <Col span={6}>{item.p85}</Col>
+                                    <Col span={6}>{item.avg}</Col>
+                                    <Col span={6}>{item.min}</Col>
+                                    <Col span={6}>{item.max}</Col>
+                                </Row>
+                            </Col>
+                            <Col span={6}>
+                                <Row >
+                                    <Col span={4}>{(item.distribution["0-3"] / item.total * 100).toFixed(0)}%</Col>
+                                    <Col span={4}>{(item.distribution["4-7"] / item.total * 100).toFixed(0)}%</Col>
+                                    <Col span={4}>{(item.distribution["8-11"] / item.total * 100).toFixed(0)}%</Col>
+                                    <Col span={4}>{(item.distribution["12-15"] / item.total * 100).toFixed(0)}%</Col>
+                                    <Col span={4}>{(item.distribution["16-30"] / item.total * 100).toFixed(0)}%</Col>
+                                    <Col span={4}>{(item.distribution["30+"] / item.total * 100).toFixed(0)}%</Col>
+                                </Row>
+                            </Col>
+                        </Row>
+                        <Divider type='horizontal' />
+                    </>))}
+            </ProCard >
         </>
     )
 }

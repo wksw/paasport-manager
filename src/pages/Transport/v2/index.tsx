@@ -208,7 +208,7 @@ const Transport: React.FC = (props) => {
                     density: false,
                     setting: false,
                 }}
-                rowKey="key"
+                rowKey={record => record.id}
                 columns={columns}
                 actionRef={ref}
                 request={async (

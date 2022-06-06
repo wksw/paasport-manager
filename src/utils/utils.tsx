@@ -52,6 +52,14 @@ export function getCarrier(detail: TRANSPORT.TrackInfo) {
   return <p>-</p>;
 }
 
+export function getCarrierByName(name: string) {
+  for (const v of carriers) {
+    if (v._name == name) {
+      return v.key
+    }
+  }
+  return '0'
+}
 export function getCarrierV2(detail: TRANSPORT_V2.TrackInfo) {
   var carrier;
   var final_carrier;

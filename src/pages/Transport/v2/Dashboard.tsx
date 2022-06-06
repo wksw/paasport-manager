@@ -19,6 +19,7 @@ import { Pie } from '@ant-design/plots';
 import { Bar } from '@ant-design/plots';
 import carriers from '@/services/17track_carriers';
 import { getCarrierText } from '@/utils/utils';
+import { history } from 'umi';
 
 // const { Panel } = Collapse;
 
@@ -92,22 +93,42 @@ const Dashboard: React.FC = () => {
     const [trackStatusConfig, setTrackStatusConfig] = useState({
         ...pieConfig,
         angleField: 'total',
-        colorField: 'track_status'
+        colorField: 'track_status',
+        onReady: (plot) => {
+            plot.on("plot:click", (event) => {
+                history.push(`/transport/v2/list?track_status=${event?.data?.data?.track_status}&begin_date=${analysisReq.begin_date.format(dateFormat)}&end_date=${analysisReq.end_date.format(dateFormat)}`)
+            })
+        }
     })
     const [transportExceptionsConfig, setTransportExceptionsConfig] = useState({
         ...pieConfig,
         angleField: 'total',
-        colorField: 'package_status'
+        colorField: 'package_status',
+        onReady: (plot) => {
+            plot.on("plot:click", (event) => {
+                history.push(`/transport/v2/list?carrier=${event?.data?.data?.carrier}&package_status=EXCEPTION&begin_date=${analysisReq.begin_date.format(dateFormat)}&end_date=${analysisReq.end_date.format(dateFormat)}`)
+            })
+        }
     })
     const [transportExceptionReasonsConfig, setTransportExceptionReasonsConfig] = useState({
         ...pieConfig,
         angleField: 'total',
-        colorField: 'package_sub_status'
+        colorField: 'package_sub_status',
+        onReady: (plot) => {
+            plot.on("plot:click", (event) => {
+                history.push(`/transport/v2/list?package_sub_status=${event?.data?.data?.package_sub_status}&package_status=EXCEPTION&begin_date=${analysisReq.begin_date.format(dateFormat)}&end_date=${analysisReq.end_date.format(dateFormat)}`)
+            })
+        }
     })
     const [transportStatusConfig, setTransportStatusConfig] = useState({
         ...pieConfig,
         angleField: 'total',
-        colorField: 'package_status'
+        colorField: 'package_status',
+        onReady: (plot) => {
+            plot.on("plot:click", (event) => {
+                history.push(`/transport/v2/list?package_status=${event?.data?.data?.package_status}&begin_date=${analysisReq.begin_date.format(dateFormat)}&end_date=${analysisReq.end_date.format(dateFormat)}`)
+            })
+        }
     });
     const [transportOverTimeConfig, setTransportOverTimeConfig] = useState({
         data: [],
@@ -168,7 +189,13 @@ const Dashboard: React.FC = () => {
         // legend: false,
         maxBarWidth: 20,
         minBarWidth: 10,
-        height: 300
+        height: 300,
+        onReady: (plot) => {
+            plot.on("plot:click", (event) => {
+                console.log('----', event);
+                history.push(`/transport/v2/list?carrier=${event?.data?.data?.carrier}&begin_date=${analysisReq.begin_date.format(dateFormat)}&end_date=${analysisReq.end_date.format(dateFormat)}`)
+            })
+        }
     })
 
     const [transportByLaneConfig, setTransportByLaneConfig] = useState({

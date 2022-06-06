@@ -8,7 +8,7 @@ import {
 import { packageStatusIcon, TransportDetail } from '@/components/Transport/v2';
 import { TransportPackageStatusEnumV2, TransportStatusEnumV2, TransportPackageSubStatusEnum } from '@/services/paasport';
 import { Button, Modal } from 'antd';
-import { getCarrierV2 } from '@/utils/utils';
+import { getCarrierByName, getCarrierV2 } from '@/utils/utils';
 import { PageContainer } from '@ant-design/pro-layout';
 import carriers from '@/services/17track_carriers';
 import { history, useLocation } from 'umi';
@@ -18,7 +18,7 @@ import { PlusOutlined } from '@ant-design/icons';
 const Transport: React.FC = (props) => {
     const { location: { query } } = props;
     const dateFormat = 'YYYY-MM-DD';
-    console.log('----query', query);
+    // console.log('----query', query);
     const [detail, setDetail] = useState<TRANSPORT_V2.TrackInfo>({});
     const [transportVisible, setTransportVisible] = useState(false);
     const ref = useRef<ActionType>();
@@ -101,8 +101,9 @@ const Transport: React.FC = (props) => {
             dataIndex: 'track',
             key: 'track',
             valueType: 'text',
+            hideInSearch: true,
             renderText: (_, record: TRANSPORT_V2.TrackInfo) => {
-                console.log('----reocrd', record);
+                // console.log('----reocrd', record);
                 if (record.package_status == 'DELIVERED') {
                     let route = '';
                     if (record.track.departure.country != '') {
@@ -132,6 +133,7 @@ const Transport: React.FC = (props) => {
             key: 'days_of_transit_done',
             align: 'center',
             valueType: 'text',
+            hideInSearch: true,
             renderText: (_, record: TRANSPORT_V2.TrackInfo) => {
                 if (record.package_status == 'DELIVERED') {
                     return record?.track?.metrics.days_of_transit_done || ''
@@ -171,7 +173,7 @@ const Transport: React.FC = (props) => {
             render: (_, record) => [
                 <a
                     onClick={() => {
-                        console.log('----track', record);
+                        // console.log('----track', record);
                         setDetail(record);
                         setTransportVisible(!transportVisible);
                     }}
@@ -217,8 +219,8 @@ const Transport: React.FC = (props) => {
                     sort,
                     filter,
                 ) => {
-                    console.log('sort', sort, 'sort_keys', Object.keys(sort), 'filter', filter);
-                    console.log('request params', params, 'filters', filter);
+                    // console.log('sort', sort, 'sort_keys', Object.keys(sort), 'filter', filter);
+                    // console.log('request params', params, 'filters', filter);
                     let sortStr = "";
                     Object.keys(sort).forEach(element => {
                         if (sort[element] == "ascend") {
@@ -230,7 +232,7 @@ const Transport: React.FC = (props) => {
                     sortStr = sortStr.replace(/^(\s|,)+|(\s|,)+$/, '');
                     const resp = await GetTracks({
                         number: params.number,
-                        carrier: params.carrier,
+                        carrier: query.carrier ? getCarrierByName(params.carrier) : params.carrier,
                         order_id: params.order_id,
                         track_status: params.track_status || -1,
                         package_status: params.package_status || -1,

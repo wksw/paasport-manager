@@ -6,7 +6,7 @@ import ProForm, { ProFormDateRangePicker } from '@ant-design/pro-form';
 import {
     TransportStatusAnalysis, TransportExceptionReasonAnalysis,
     TransportExceptionByCarrierAnalysis, TransportDeliveredAndNoDeliveredAnalysis,
-    TransportCountWithCarrierAnalysis, TransportTrackStatusAnalysis,
+    TransportCountWithCarrierAnalysis, TransportCountWithLaneAnalysis, TransportTrackStatusAnalysis,
     TransportTransitAnalysis, TransportTransitAvgTimeAnalysis, TransportTransitP85TimeAnalysis,
     TransportTransitByCarrierAnalysis, TransportTransitByLaneAnalysis
 } from '@/services/paasport/transport/v2/transport_v2_umirequest';
@@ -33,11 +33,18 @@ const Dashboard: React.FC = () => {
         carrier: 0,
         provider: -1,
         lane: 0,
+        count_lane: 0,
     })
     const onLaneChanged = ({ target: { value } }: RadioChangeEvent) => {
         setAnalysisReq({
             ...analysisReq,
             lane: value
+        })
+    }
+    const getCountOnLaneChanged = ({ target: { value } }: RadioChangeEvent) => {
+        setAnalysisReq({
+            ...analysisReq,
+            count_lane: value
         })
     }
     const [durationDays, setDurationDays] = useState(0);
@@ -158,7 +165,17 @@ const Dashboard: React.FC = () => {
         data: [],
         xField: 'total',
         yField: 'carrier',
-        legend: false,
+        // legend: false,
+        maxBarWidth: 20,
+        minBarWidth: 10,
+        height: 300
+    })
+
+    const [transportByLaneConfig, setTransportByLaneConfig] = useState({
+        data: [],
+        xField: 'total',
+        yField: 'lane',
+        // legend: false,
         maxBarWidth: 20,
         minBarWidth: 10,
         height: 300
@@ -277,6 +294,20 @@ const Dashboard: React.FC = () => {
                 data: resp.data,
             })
         }
+        const getTransportCountWithLane = async () => {
+            const resp = await TransportCountWithLaneAnalysis({
+                begin_date: analysisReq.begin_date?.format(rfc3339),
+                end_date: analysisReq.end_date?.format(rfc3339),
+                app_id: analysisReq.app_id,
+                carrier: analysisReq.carrier,
+                provider: analysisReq.provider,
+                lane: analysisReq.count_lane,
+            })
+            setTransportByLaneConfig({
+                ...transportByLaneConfig,
+                data: resp.data,
+            })
+        }
         const getTransportTrackStatus = async () => {
             const resp = await TransportTrackStatusAnalysis({
                 begin_date: analysisReq.begin_date?.format(rfc3339),
@@ -391,6 +422,7 @@ const Dashboard: React.FC = () => {
         getTransportExceptions();
         getTransportOvertime();
         getTransportCountWithCarrier();
+        getTransportCountWithLane();
         getTransportTrackStatus();
         getTransitAvgTime();
         getTransitP85Time();
@@ -545,6 +577,29 @@ const Dashboard: React.FC = () => {
                     }}>view detail</ULink>}
                 >
                     <Column {...transportOverTimeConfig} />
+                </ProCard>
+            </ProCard>
+
+            <ProCard ghost gutter={8} style={{ marginTop: 16 }}>
+                <ProCard
+                    hoverable
+                    title='Total shipments by lane'
+                >
+                    <Radio.Group
+                        options={[{
+                            label: 'By State',
+                            value: 0,
+                        }, {
+                            label: 'By Country',
+                            value: 1,
+                        }]}
+                        value={analysisReq.count_lane}
+                        onChange={getCountOnLaneChanged}
+                        optionType='button'
+                        buttonStyle='outline'
+                        style={{ marginBottom: 10 }}
+                    />
+                    <Bar {...transportByLaneConfig} />
                 </ProCard>
             </ProCard>
 

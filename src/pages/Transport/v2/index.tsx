@@ -153,7 +153,7 @@ const Transport: React.FC = (props) => {
             valueType: 'dateRange',
             key: 'created_at_from_to',
             hideInTable: true,
-            initialValue: [query.begin_date || moment(moment().add(-30, "days"), dateFormat), query.end_date || moment(moment().add(1, 'days'), dateFormat)],
+            initialValue: [query.begin_date || moment(moment().add(-7, "days"), dateFormat), query.end_date || moment(moment().add(1, 'days'), dateFormat)],
         },
         {
             title: '更新时间',

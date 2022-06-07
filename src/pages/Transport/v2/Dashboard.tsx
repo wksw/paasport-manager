@@ -15,7 +15,7 @@ import TransitAnalysis from './components/transit_analysis';
 const Dashboard: React.FC = () => {
     const dateFormat = 'YYYY-MM-DD';
     const [analysisReq, setAnalysisReq] = useState({
-        begin_date: moment(moment().add(-30, "days"), dateFormat),
+        begin_date: moment(moment().add(-7, "days"), dateFormat),
         end_date: moment(moment().add(1, 'days'), dateFormat),
         app_id: '0',
         carrier: 0,

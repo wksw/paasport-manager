@@ -175,7 +175,9 @@ export const TransportPackageStatusEnum = {
   40: '成功签收',
   50: '可能异常',
 };
-
+export const TransportProvider = {
+  0: '17Track'
+}
 export const TransportPackageSubStatusEnum = {
   "": "所有",
   "EMPTY": "",

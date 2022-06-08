@@ -88,7 +88,7 @@ const TransitByLaneAnalysis: React.FC<TransitByLaneAnalysisReq> = (props) => {
                                 </Row>
                             </Col>
                             <Col span={6}>
-                                <Row >
+                                {item.distribution && <Row >
                                     <Col span={4}>{(item.distribution["0-3"] / item.total * 100).toFixed(0)}%</Col>
                                     <Col span={4}>{(item.distribution["4-7"] / item.total * 100).toFixed(0)}%</Col>
                                     <Col span={4}>{(item.distribution["8-11"] / item.total * 100).toFixed(0)}%</Col>
@@ -96,6 +96,7 @@ const TransitByLaneAnalysis: React.FC<TransitByLaneAnalysisReq> = (props) => {
                                     <Col span={4}>{(item.distribution["16-30"] / item.total * 100).toFixed(0)}%</Col>
                                     <Col span={4}>{(item.distribution["30+"] / item.total * 100).toFixed(0)}%</Col>
                                 </Row>
+                                }
                             </Col>
                         </Row>
                         <Divider type='horizontal' />

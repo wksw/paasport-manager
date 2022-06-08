@@ -6,14 +6,17 @@ import {
     DeleteTracks,
 } from '@/services/paasport/transport/v2/transport_v2_umirequest';
 import { packageStatusIcon, TransportDetail } from '@/components/Transport/v2';
-import { TransportPackageStatusEnumV2, TransportStatusEnumV2, TransportPackageSubStatusEnum } from '@/services/paasport';
-import { Button, Modal } from 'antd';
+import { TransportPackageStatusEnumV2, TransportStatusEnumV2, TransportPackageSubStatusEnum, TransportProvider } from '@/services/paasport';
+import { Button, Drawer, Modal, Space, Timeline, Typography } from 'antd';
 import { getCarrierByName, getCarrierV2 } from '@/utils/utils';
 import { PageContainer } from '@ant-design/pro-layout';
 import carriers from '@/services/17track_carriers';
-import { history, useLocation } from 'umi';
+import { history, Link, useLocation } from 'umi';
 import moment from 'moment';
-import { PlusOutlined } from '@ant-design/icons';
+import { CloseOutlined, EyeOutlined, PlusOutlined } from '@ant-design/icons';
+import Detail from './components/detail';
+import ProCard from '@ant-design/pro-card';
+import ProDescriptions from '@ant-design/pro-descriptions';
 
 const Transport: React.FC = (props) => {
     const { location: { query } } = props;
@@ -208,7 +211,7 @@ const Transport: React.FC = (props) => {
                     density: false,
                     setting: false,
                 }}
-                rowKey={record => record.id}
+                rowKey={record => record.id || ''}
                 columns={columns}
                 actionRef={ref}
                 request={async (
@@ -252,7 +255,7 @@ const Transport: React.FC = (props) => {
                     };
                 }}
             ></ProTable>
-            <Modal
+            {/* <Modal
                 visible={transportVisible}
                 onCancel={() => setTransportVisible(!transportVisible)}
                 closable={false}
@@ -262,7 +265,152 @@ const Transport: React.FC = (props) => {
                 width={750}
             >
                 <TransportDetail detail={detail} />
-            </Modal>
+            </Modal> */}
+            {/* <Detail detail={detail} visible={transportVisible}></Detail> */}
+            <Drawer
+                title={(
+                    <Space direction='vertical'>
+                        <Typography.Title level={5} underline copyable>{detail.number}</Typography.Title>
+                        <Link to={{
+                            pathname: '/transport/v2/track',
+                            search: `?number=${detail.number}`
+                        }} >
+                            <Typography.Text type='secondary' >
+                                <Space>
+                                    <EyeOutlined disabled={true} />
+                                    View tracking page
+                                </Space>
+                            </Typography.Text>
+                        </Link>
+                    </Space>
+                )}
+                visible={transportVisible}
+                width={600}
+                closable={false}
+                onClose={() => setTransportVisible(!transportVisible)}
+                extra={<CloseOutlined onClick={() => setTransportVisible(!transportVisible)} />}
+            >
+                <Timeline>
+                    {detail?.track?.events?.map((item: any) => (
+                        <Timeline.Item>
+                            <span style={{ fontWeight: 'bold' }}>{moment(item?.created_at).format("YYYY-MM-DD HH:mm:ss")}</span> {item?.location?.country}{item?.location?.city ? ',' + item?.location?.city : ''}: {item?.description}
+                        </Timeline.Item>
+                    ))}
+                </Timeline>
+                <ProCard
+                    title='Shipment details'
+                >
+                    <ProDescriptions
+                        column={1}
+                        layout='horizontal'
+                    >
+                        <ProDescriptions.Item
+                            valueType='text'
+                            label='Number'
+                            span={1}
+                            ellipsis
+                            copyable
+                            contentStyle={{ textAlign: 'right' }}
+                        >
+                            {detail.number}
+                        </ProDescriptions.Item>
+                        <ProDescriptions.Item
+                            valueType='text'
+                            ellipsis
+                            label='Carrier'
+                            contentStyle={{ textAlign: 'right' }}
+                        >
+                            {getCarrierV2(detail)}
+                        </ProDescriptions.Item>
+                        <ProDescriptions.Item
+                            valueType='text'
+                            ellipsis
+                            label='OrderId'
+                            copyable
+                            contentStyle={{ textAlign: 'right' }}
+                        >
+                            {detail.order_id}
+                        </ProDescriptions.Item>
+                        <ProDescriptions.Item
+                            valueType='text'
+                            ellipsis
+                            label='Version'
+                            contentStyle={{ textAlign: 'right' }}
+                        >
+                            {detail.version}
+                        </ProDescriptions.Item>
+                        <ProDescriptions.Item
+                            valueType='text'
+                            ellipsis
+                            label='Provider'
+                            contentStyle={{ textAlign: 'right' }}
+                        >
+                            {TransportProvider[detail.provider] || 'Unknown'}
+                        </ProDescriptions.Item>
+                        <ProDescriptions.Item
+                            valueType='text'
+                            ellipsis
+                            label='Status'
+                            contentStyle={{ textAlign: 'right' }}
+                        >
+                            {detail.track_status}
+                        </ProDescriptions.Item>
+                        <ProDescriptions.Item
+                            valueType='text'
+                            ellipsis
+                            label='PackageStatus'
+                            contentStyle={{ textAlign: 'right' }}
+                        >
+                            {detail.package_status}
+                        </ProDescriptions.Item>
+                        <ProDescriptions.Item
+                            valueType='text'
+                            ellipsis
+                            label='PackageSubStatus'
+                            contentStyle={{ textAlign: 'right' }}
+                        >
+                            {detail.package_sub_status}
+                        </ProDescriptions.Item>
+                        <ProDescriptions.Item
+                            valueType='dateTime'
+                            label='CreatedAt'
+                            ellipsis
+                            contentStyle={{ justifyContent: 'flex-end' }}
+                        >
+                            {detail.created_at}
+                        </ProDescriptions.Item>
+                        <ProDescriptions.Item
+                            valueType='dateTime'
+                            label='UpdatedAt'
+                            ellipsis
+                            contentStyle={{ justifyContent: 'flex-end' }}
+                        >
+                            {detail.updated_at}
+                        </ProDescriptions.Item>
+                        <ProDescriptions.Item
+                            valueType='text'
+                            ellipsis
+                            label='Note'
+                            contentStyle={{ textAlign: 'right' }}
+                        >
+                            {detail.note}
+                        </ProDescriptions.Item>
+                        <ProDescriptions.Item
+                            valueType='textarea'
+                            label='Log'
+                            contentStyle={{ textAlign: 'right' }}
+                        >
+                            {detail.log}
+                        </ProDescriptions.Item>
+                        <ProDescriptions.Item
+                            valueType='jsonCode'
+                            label='TrackRaw'
+                        >
+                            {detail.track_raw}
+                        </ProDescriptions.Item>
+                    </ProDescriptions>
+                </ProCard>
+            </Drawer>
         </PageContainer >
     );
 };

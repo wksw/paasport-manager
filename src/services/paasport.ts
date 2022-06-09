@@ -176,6 +176,7 @@ export const TransportPackageStatusEnum = {
   50: '可能异常',
 };
 export const TransportProvider = {
+  '': '全部',
   0: '17Track'
 }
 export const TransportAlterResolved = {

@@ -24,7 +24,8 @@ const TransportError: React.FC = () => {
             title: '供应商',
             dataIndex: 'provider',
             valueEnum: TransportProvider,
-            initialValue: '0',
+            initialValue: '',
+            align: 'center',
         },
         {
             title: '发生时间',
@@ -85,7 +86,7 @@ const TransportError: React.FC = () => {
                         size: params.pageSize,
                         sort: sortStr,
                         methods: methods,
-                        provider: params.provider,
+                        provider: params.provider || -1,
                     });
                     return {
                         data: resp.data,

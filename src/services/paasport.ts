@@ -178,6 +178,25 @@ export const TransportPackageStatusEnum = {
 export const TransportProvider = {
   0: '17Track'
 }
+export const TransportAlterResolved = {
+  '': '所有',
+  true: '已处理',
+  false: '未处理'
+}
+
+export const TransportAlterEvent = {
+  'REPORT_LATE': '上报超时',
+  'TRANSIT_LATE': '运输超时'
+}
+
+export const RequestProviderEvent = {
+  "REGISTE": "注册",
+  "STOP": "停止",
+  "RETRACK": "重启",
+  "DELETE": "删除",
+  "GET": "获取",
+  "PUSH": "重新推送",
+}
 export const TransportPackageSubStatusEnum = {
   "": "所有",
   "EMPTY": "",

@@ -62,8 +62,8 @@ const StatisticAnalysis: React.FC<StatisticAnalysisReq> = (props) => {
             title={<Typography.Text type='danger'>WARNGINGS</Typography.Text>}
             layout='center'
             extra={<Link to={{
-                pathname: '/transport/v2/list',
-                search: `?begin_date=${analysisReq.begin_date.format(dateFormat)}&end_date=${analysisReq.end_date.format(dateFormat)}`
+                pathname: '/transport/v2/alter',
+                search: `?resolved=false`
             }}><RightOutlined /></Link>}
         >
             <Space direction='vertical'>

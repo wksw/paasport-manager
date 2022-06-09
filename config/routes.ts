@@ -112,6 +112,18 @@ export default [
         component: './Transport/v2',
       },
       {
+        path: '/transport/v2/alter',
+        access: 'transportAllPermission',
+        name: '告警',
+        component: './Transport/v2/Alter',
+      },
+      {
+        path: '/transport/v2/error',
+        access: 'transportAllPermission',
+        name: '错误',
+        component: './Transport/v2/Error',
+      },
+      {
         path: '/transport/track',
         name: '物流查询',
         layout: false,

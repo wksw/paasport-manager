@@ -6,9 +6,8 @@ import {
   GetAllowDevices,
   GetDenyLoginTypes,
 } from '@/services/paasport/auth/auth_umirequest';
-import { Checkbox, CheckboxOptionType } from 'antd';
+import { Checkbox } from 'antd';
 import { LoginTypeEnum } from '@/services/paasport';
-// import Login from '../Login';
 
 const SecurityIP: React.FC<COMMON.ReqWithUid> = (props) => {
   const { uid } = props;

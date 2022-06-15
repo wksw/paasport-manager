@@ -8,18 +8,22 @@ import StatusAnalysis from './components/status_analysis';
 import CountAnalysis from './components/count_analysis';
 import ExceptionAnalysis from './components/exception_analysis';
 import TransitAnalysis from './components/transit_analysis';
+import { getCarrierByName } from '@/utils/utils';
+import { TransportProvider } from '@/services/paasport/common/common';
 
 // const { Panel } = Collapse;
 
 
-const Dashboard: React.FC = () => {
+const Dashboard: React.FC = (props) => {
+    const { location: { query } } = props;
     const dateFormat = 'YYYY-MM-DD';
+    console.log('--quer carrier---', query.carrier);
     const [analysisReq, setAnalysisReq] = useState({
-        begin_date: moment(moment().add(-7, "days"), dateFormat),
+        begin_date: moment(moment().add(-7, 'days'), dateFormat),
         end_date: moment(moment().add(1, 'days'), dateFormat),
         app_id: '0',
-        carrier: 0,
-        provider: -1,
+        carrier: query.carrier ? getCarrierByName(query.carrier) : 0,
+        provider: query.provider ? TransportProvider[query.provider] : -1,
         lane: 0,
         count_lane: 0,
     })

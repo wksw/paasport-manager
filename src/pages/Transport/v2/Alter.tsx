@@ -1,20 +1,75 @@
-import { TransportAlterEvent, TransportAlterResolved } from '@/services/paasport';
+import { TransportAlterEvent, TransportAlterResolved, TransportPackageStatusEnumV2, TransportPackageSubStatusEnum, TransportProvider, TransportStatusEnumV2 } from '@/services/paasport';
 import { GetAlters } from '@/services/paasport/transport/v2/transport_v2_umirequest';
 import ProTable, { ProColumns } from '@ant-design/pro-table';
-import React from 'react';
+import React, { useState } from 'react';
+import carriers from '@/services/17track_carriers';
+import { getCarrierV2 } from '@/utils/utils';
+import { packageStatusIcon } from '@/components/Transport';
+import { Divider, Drawer, Space, Timeline, Typography } from 'antd';
 import { Link } from 'umi';
+import { CloseOutlined, EyeOutlined } from '@ant-design/icons';
+import moment from 'moment';
+import ProDescriptions from '@ant-design/pro-descriptions';
+import Detail from './components/detail';
 
 const TransportAlter: React.FC = (props) => {
     const { location: { query } } = props;
+    const [detail, setDetail] = useState<TRANSPORT_V2.TrackInfo>({});
+    const [transportVisible, setTransportVisible] = useState(false);
     const columns: ProColumns<TRANSPORT_V2.TransportAlterResp_Data>[] = [
         {
-            title: '物流ID',
+            title: '单号',
+            dataIndex: 'track_info.number',
+            key: 'track_info.number',
+            copyable: true,
             hideInSearch: true,
-            dataIndex: 'transport_id',
-            renderText: (_, record) => <Link to={{
-                pathname: "/transport/v2/track",
-                search: `?number=${record.transport_id}`
-            }}> {record.transport_id}</ Link >
+            width: 200,
+            renderText: (_, record) => record.track_info.number
+        },
+        {
+            title: '运输商',
+            dataIndex: 'track_info.carrier',
+            key: 'carrier',
+            hideInSearch: true,
+            valueEnum: () => {
+                let carrierEnum = {}
+                carrierEnum['0'] = "所有";
+                carriers.forEach(element => {
+                    carrierEnum[element.key] = element._name
+                })
+                return carrierEnum
+            },
+            render: (_, record) => [getCarrierV2(record.track_info)],
+        },
+        {
+            title: '订单号',
+            dataIndex: 'track_info.order_id',
+            key: 'order_id',
+            valueType: 'text',
+            copyable: true,
+            hideInSearch: true,
+            width: 200,
+            renderText: (_, record) => record.track_info.order_id
+        },
+        {
+            title: '物流状态',
+            dataIndex: 'track_info.track_status',
+            key: 'track_status',
+            valueEnum: TransportStatusEnumV2,
+            hideInSearch: true,
+            renderText: (_, record) => record.track_info.track_status
+        },
+        {
+            title: '包裹状态',
+            dataIndex: 'track_info.package_status',
+            hideInSearch: true,
+            key: 'package_status',
+            valueEnum: TransportPackageStatusEnumV2,
+            initialValue: query.package_status || '',
+            render: (_, record) => [
+                packageStatusIcon(record.track_info.package_status, 15),
+                <span> {TransportPackageStatusEnumV2[record.track_info.package_status]} {TransportPackageSubStatusEnum[record.track_info.package_sub_status]}</span>,
+            ],
         },
         {
             title: '事件',
@@ -46,53 +101,71 @@ const TransportAlter: React.FC = (props) => {
             sorter: true,
             valueType: 'dateTime',
             dataIndex: 'updated_at',
-        }
+        },
+        {
+            title: '操作',
+            valueType: 'option',
+            render: (_, record) => [
+                <a
+                    onClick={() => {
+                        // console.log('----track', record);
+                        setDetail(record.track_info);
+                        setTransportVisible(!transportVisible);
+                    }}
+                >
+                    详情
+                </a>,
+            ],
+        },
     ]
     return (
-        <ProTable
-            options={{
-                density: false,
-                setting: false,
-            }}
-            rowKey={record => record.transport_id || ''}
-            columns={columns}
-            request={async (
-                params: any & {
-                    pageSize: number;
-                    current: number;
-                },
-                sort,
-                filter,
-            ) => {
-                console.log("params=", params);
-                let sortStr = "";
-                Object.keys(sort).forEach(element => {
-                    if (sort[element] == "ascend") {
-                        sortStr += ",+" + element
-                    } else {
-                        sortStr += ",-" + element
+        <>
+            <ProTable
+                options={{
+                    density: false,
+                    setting: false,
+                }}
+                rowKey={record => record.transport_id || ''}
+                columns={columns}
+                request={async (
+                    params: any & {
+                        pageSize: number;
+                        current: number;
+                    },
+                    sort,
+                    filter,
+                ) => {
+                    console.log("params=", params);
+                    let sortStr = "";
+                    Object.keys(sort).forEach(element => {
+                        if (sort[element] == "ascend") {
+                            sortStr += ",+" + element
+                        } else {
+                            sortStr += ",-" + element
+                        }
+                    })
+                    sortStr = sortStr.replace(/^(\s|,)+|(\s|,)+$/, '');
+                    let events = "";
+                    if (params.event) {
+                        events = params.event.join();
                     }
-                })
-                sortStr = sortStr.replace(/^(\s|,)+|(\s|,)+$/, '');
-                let events = "";
-                if (params.event) {
-                    events = params.event.join();
-                }
-                const resp = await GetAlters({
-                    page: params.current,
-                    size: params.pageSize,
-                    sort: sortStr,
-                    all: params.resolved ? params.resolved == -1 : true,
-                    events: events,
-                    resolved: params.resolved ? params.resolved == -1 ? false : params.resolved : false
-                });
-                return {
-                    data: resp.data,
-                    success: true,
-                    total: resp.total,
-                };
-            }}
-        ></ProTable>
+                    const resp = await GetAlters({
+                        page: params.current,
+                        size: params.pageSize,
+                        sort: sortStr,
+                        all: params.resolved ? params.resolved == -1 : true,
+                        events: events,
+                        resolved: params.resolved ? params.resolved == -1 ? false : params.resolved : false
+                    });
+                    return {
+                        data: resp.data,
+                        success: true,
+                        total: resp.total,
+                    };
+                }}
+            ></ProTable>
+            <Detail detail={detail} visible={transportVisible} onClose={(visible: boolean) => setTransportVisible(visible)} />
+        </>
     )
 }
 

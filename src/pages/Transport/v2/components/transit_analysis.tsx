@@ -228,12 +228,12 @@ const TransitAnalysis: React.FC<TransitAnalysisReq> = (props) => {
                             </Col>
                             <Col span={6}>
                                 {item.distribution && <Row >
-                                    <Col span={4}>{(item.distribution["0-3"] / item.total * 100).toFixed(0)}%</Col>
-                                    <Col span={4}>{(item.distribution["4-7"] / item.total * 100).toFixed(0)}%</Col>
-                                    <Col span={4}>{(item.distribution["8-11"] / item.total * 100).toFixed(0)}%</Col>
-                                    <Col span={4}>{(item.distribution["12-15"] / item.total * 100).toFixed(0)}%</Col>
-                                    <Col span={4}>{(item.distribution["16-30"] / item.total * 100).toFixed(0)}%</Col>
-                                    <Col span={4}>{(item.distribution["30+"] / item.total * 100).toFixed(0)}%</Col>
+                                    <Col span={4}>{(item.distribution["0-3"] / item.delivered * 100).toFixed(0)}%</Col>
+                                    <Col span={4}>{(item.distribution["4-7"] / item.delivered * 100).toFixed(0)}%</Col>
+                                    <Col span={4}>{(item.distribution["8-11"] / item.delivered * 100).toFixed(0)}%</Col>
+                                    <Col span={4}>{(item.distribution["12-15"] / item.delivered * 100).toFixed(0)}%</Col>
+                                    <Col span={4}>{(item.distribution["16-30"] / item.delivered * 100).toFixed(0)}%</Col>
+                                    <Col span={4}>{(item.distribution["30+"] / item.delivered * 100).toFixed(0)}%</Col>
                                 </Row>
                                 }
                             </Col>

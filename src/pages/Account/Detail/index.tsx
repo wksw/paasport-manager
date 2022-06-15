@@ -17,6 +17,7 @@ import { PageContainer } from '@ant-design/pro-layout';
 import ProDescriptions from '@ant-design/pro-descriptions';
 import { ProColumns } from '@ant-design/pro-table';
 import ProCard from '@ant-design/pro-card';
+import AccountSubscribes from './subscribe';
 
 const AccountDetail: React.FC = () => {
   const { uid } = useParams();
@@ -159,6 +160,9 @@ const AccountDetail: React.FC = () => {
             </TabPane>
             <TabPane tab="安全" key="security">
               <AccountSecurity uid={accountInfo.uid} />
+            </TabPane>
+            <TabPane tab="订阅" key="subscribe">
+              <AccountSubscribes uid={accountInfo?.uid} />
             </TabPane>
           </Tabs>
         )}

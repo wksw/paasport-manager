@@ -5,18 +5,17 @@ import {
     Registe,
     DeleteTracks,
 } from '@/services/paasport/transport/v2/transport_v2_umirequest';
-import { packageStatusIcon, TransportDetail } from '@/components/Transport/v2';
+import { packageStatusIcon } from '@/components/Transport/v2';
 import { TransportPackageStatusEnumV2, TransportStatusEnumV2, TransportPackageSubStatusEnum, TransportProvider } from '@/services/paasport';
-import { Button, Divider, Drawer, Modal, Space, Timeline, Typography } from 'antd';
+import { Button, Divider, Drawer, Space, Timeline, Typography } from 'antd';
 import { getCarrierByName, getCarrierV2 } from '@/utils/utils';
 import { PageContainer } from '@ant-design/pro-layout';
 import carriers from '@/services/17track_carriers';
-import { history, Link, useLocation } from 'umi';
+import { history, Link } from 'umi';
 import moment from 'moment';
 import { CloseOutlined, EyeOutlined, PlusOutlined } from '@ant-design/icons';
-import Detail from './components/detail';
-import ProCard from '@ant-design/pro-card';
 import ProDescriptions from '@ant-design/pro-descriptions';
+import Detail from './components/detail';
 
 const Transport: React.FC = (props) => {
     const { location: { query } } = props;
@@ -268,166 +267,8 @@ const Transport: React.FC = (props) => {
                     };
                 }}
             ></ProTable>
-            <Drawer
-                title={(
-                    <Space direction='vertical'>
-                        <Space direction='horizontal'>
-                            {packageStatusIcon(detail?.package_status, 20)}
-                            <Typography.Title level={5} underline copyable>{detail.number}</Typography.Title>
-                        </Space>
-                        <Link to={{
-                            pathname: '/transport/v2/track',
-                            search: `?number=${detail.number}`
-                        }} >
-                            <Typography.Text type='secondary' >
-                                <Space>
-                                    <EyeOutlined disabled={true} />
-                                    View tracking page
-                                </Space>
-                            </Typography.Text>
-                        </Link>
-                    </Space>
-                )}
-                visible={transportVisible}
-                width={600}
-                closable={false}
-                onClose={() => setTransportVisible(!transportVisible)}
-                extra={<CloseOutlined onClick={() => setTransportVisible(!transportVisible)} />}
-            >
-                {detail.package_status == 'DELIVERED' && <>
-                    <Typography.Title level={4}>Delivered on {moment(detail.track.latest_event.created_at).format("YYYY-MM-DD")}</Typography.Title>
-                    <Divider />
-                </>}
-                <Timeline>
-                    {detail?.track?.events?.map((item: any) => (
-                        <Timeline.Item>
-                            <Space direction='vertical'>
-                                <Typography.Title level={5}> {item?.description}</Typography.Title>
-                                <Typography.Text type='secondary'>{item?.location?.country}{item?.location?.city ? ',' + item?.location?.city : ''} • {item.provider.name} </Typography.Text>
-                                <Typography.Text type='secondary'>{moment(item?.created_at).format("YYYY-MM-DD HH:mm:ss")}(Local time)</Typography.Text>
-                            </Space>
-                        </Timeline.Item>
-                    ))}
-                </Timeline>
-                {detail.package_status == 'DELIVERED' && <>
-                    <Divider /> <Typography.Text type='secondary' style={{ fontSize: 18 }}>destination is {detail.track.destination.country} • Transit in {detail.track.metrics.days_of_transit_done} days</Typography.Text>
-                </>}
-                <Divider />
-                <ProDescriptions
-                    title='Shipment details'
-                    column={1}
-                    layout='horizontal'
-                >
-                    <ProDescriptions.Item
-                        valueType='text'
-                        label='Number'
-                        span={1}
-                        ellipsis
-                        copyable
-                        contentStyle={{ textAlign: 'right' }}
-                    >
-                        {detail.number}
-                    </ProDescriptions.Item>
-                    <ProDescriptions.Item
-                        valueType='text'
-                        ellipsis
-                        label='Carrier'
-                        contentStyle={{ textAlign: 'right' }}
-                    >
-                        {getCarrierV2(detail)}
-                    </ProDescriptions.Item>
-                    <ProDescriptions.Item
-                        valueType='text'
-                        ellipsis
-                        label='OrderId'
-                        copyable
-                        contentStyle={{ textAlign: 'right' }}
-                    >
-                        {detail.order_id}
-                    </ProDescriptions.Item>
-                    <ProDescriptions.Item
-                        valueType='text'
-                        ellipsis
-                        label='Version'
-                        contentStyle={{ textAlign: 'right' }}
-                    >
-                        {detail.version}
-                    </ProDescriptions.Item>
-                    <ProDescriptions.Item
-                        valueType='text'
-                        ellipsis
-                        label='Provider'
-                        contentStyle={{ textAlign: 'right' }}
-                    >
-                        {TransportProvider[detail.provider] || 'Unknown'}
-                    </ProDescriptions.Item>
-                    <ProDescriptions.Item
-                        valueType='text'
-                        ellipsis
-                        label='Status'
-                        contentStyle={{ textAlign: 'right' }}
-                    >
-                        {detail.track_status}
-                    </ProDescriptions.Item>
-                    <ProDescriptions.Item
-                        valueType='text'
-                        ellipsis
-                        label='PackageStatus'
-                        contentStyle={{ textAlign: 'right' }}
-                    >
-                        {detail.package_status}
-                    </ProDescriptions.Item>
-                    <ProDescriptions.Item
-                        valueType='text'
-                        ellipsis
-                        label='PackageSubStatus'
-                        contentStyle={{ textAlign: 'right' }}
-                    >
-                        {detail.package_sub_status}
-                    </ProDescriptions.Item>
-                    <ProDescriptions.Item
-                        valueType='dateTime'
-                        label='CreatedAt'
-                        fieldProps={{
-                            format: 'YYYY-MM-DD HH:mm:ss',
-                        }}
-                        contentStyle={{ justifyContent: 'flex-end' }}
-                    >
-                        {detail.created_at}
-                    </ProDescriptions.Item>
-                    <ProDescriptions.Item
-                        valueType='dateTime'
-                        label='UpdatedAt'
-                        fieldProps={{
-                            format: 'YYYY-MM-DD HH:mm:ss',
-                        }}
-                        contentStyle={{ justifyContent: 'flex-end' }}
-                    >
-                        {detail.updated_at}
-                    </ProDescriptions.Item>
-                    <ProDescriptions.Item
-                        valueType='text'
-                        ellipsis
-                        label='Note'
-                        contentStyle={{ textAlign: 'right' }}
-                    >
-                        {detail.note}
-                    </ProDescriptions.Item>
-                    <ProDescriptions.Item
-                        valueType='textarea'
-                        label='Log'
-                        contentStyle={{ textAlign: 'right', justifyContent: 'flex-end' }}
-                    >
-                        {detail.log}
-                    </ProDescriptions.Item>
-                    <ProDescriptions.Item
-                        valueType='jsonCode'
-                        label='TrackRaw'
-                    >
-                        {detail.track_raw}
-                    </ProDescriptions.Item>
-                </ProDescriptions>
-            </Drawer>
+
+            <Detail detail={detail} visible={transportVisible} onClose={(visible: boolean) => setTransportVisible(visible)} />
         </PageContainer >
     );
 };

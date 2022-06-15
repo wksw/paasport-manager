@@ -1,8 +1,7 @@
 import type { Settings as LayoutSettings } from '@ant-design/pro-layout';
-import { SettingDrawer } from '@ant-design/pro-layout';
 import { PageLoading } from '@ant-design/pro-layout';
 import type { RunTimeLayoutConfig } from 'umi';
-import { RequestConfig, ErrorShowType } from 'umi';
+import { RequestConfig } from 'umi';
 import { RequestOptionsInit, RequestInterceptor, ResponseInterceptor, Context } from 'umi-request';
 import { history } from 'umi';
 import RightContent from '@/components/RightContent';
@@ -13,8 +12,9 @@ import { GetResourceBindRoles as GetAccountRoles } from '@/services/paasport/aut
 // import { BookOutlined, LinkOutlined } from '@ant-design/icons';
 import defaultSettings from '../config/defaultSettings';
 // import defineConfig from '../config/config';
-import { Get as GetStorage } from './storage/storage';
-import { Button, message, Result } from 'antd';
+import { Set as SetStorage, Get as GetStorage } from './storage/storage';
+import { Button, Result } from 'antd';
+import { LoginWithToken } from './services/paasport/login/login_umirequest';
 
 // const isDev = process.env.NODE_ENV === 'development';
 const loginPath = '/login';
@@ -37,6 +37,17 @@ export async function getInitialState(): Promise<{
 }> {
   const fetchUserInfo = async () => {
     try {
+      // 如果参数中包含token， 则使用token登陆
+      let params = new URLSearchParams(location.search);
+      console.log('----token=', params.get('token'));
+      if (params.get('token')) {
+        const tokenDetail = await LoginWithToken({}, {
+          headers: {
+            'X-Sub-Token': params.get('token')
+          }
+        })
+        SetStorage('X-Auth-Token', tokenDetail, tokenDetail.expires_at);
+      }
       const info = await GetAccountInfo();
       const roles = await GetAccountRoles({ resource: info.uid });
       return {
@@ -44,7 +55,12 @@ export async function getInitialState(): Promise<{
         roles: roles,
       };
     } catch (error) {
-      history.push(loginPath + `?redirect=${encodeURIComponent(window.location.pathname)}`);
+      // let redirectPath = location.pathname
+      // console.log('------fetchuserInfo', redirectPath == loginPath)
+      // let params = new URLSearchParams(location.search);
+      // console.log('----token=', params.get('token'));
+      console.log('-----error', error);
+      // history.push(loginPath + redirectPath == loginPath ? '' : `?redirect=${encodeURIComponent(redirectPath)}`);
     }
     return undefined;
   };
@@ -170,8 +186,13 @@ const paasportResponseInterceptor: ResponseInterceptor = (
   response: Response,
   options: RequestOptionsInit,
 ) => {
-  // console.log('-----paasportResponseInterceptor: ', response);
   if (response.status == 401) {
+    console.log('----401-', location.pathname);
+    let redirectPath = location.pathname
+    console.log('------fetchuserInfo', redirectPath == loginPath)
+    let params = new URLSearchParams(location.search);
+    console.log('----token=', params.get('token'));
+    // history.push(loginPath + redirectPath == loginPath ? '' : `?redirect=${encodeURIComponent(redirectPath)}`);
     history.push(loginPath);
   }
   return response;

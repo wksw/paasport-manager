@@ -39,7 +39,13 @@ export async function getInitialState(): Promise<{
     try {
       // 如果参数中包含token， 则使用token登陆
       let params = new URLSearchParams(location.search);
-      console.log('----token=', params.get('token'));
+      if (params.get('endpoint')) {
+        SetStorage('PAASPORT-ENDPOINT', params.get('endpoint'), -1);
+      }
+      if (params.get('tenant')) {
+        SetStorage('PAASPORT-CURRENT-TENANT', params.get('tenant'), -1);
+      }
+      // console.log('----token=', params.get('token'));
       if (params.get('token')) {
         const tokenDetail = await LoginWithToken({}, {
           headers: {

@@ -246,3 +246,54 @@ export const TransportPackageSubStatusEnum = {
   "EXCEPTION_CANCELED": "被取消",
   "EXCEPTION_OTHER": "其他原因",
 }
+
+export const endpoints = [{
+  label: '本地开发环境',
+  value: 'http://paasport.com:9091'
+}, {
+  label: 'IDC开发环境',
+  value: 'https://cn-shenzhen.passport.zieldev.com:7443'
+}, {
+  label: 'IDC生产环境',
+  value: 'https://cn-shenzhen.passport.ziel.cn:7443',
+}, {
+  label: '香港生产环境',
+  value: 'https://passport-gw.zielhome.com',
+}];
+
+export const tenants = {
+  'http://paasport.com:9091': [{
+    label: '主租户',
+    value: 'paasport'
+  }],
+  'https://cn-shenzhen.passport.zieldev.com:7443': [{
+    label: '主租户',
+    value: 'paasport'
+  }, {
+    label: '测试租户',
+    value: 'test'
+  }],
+  'https://cn-shenzhen.passport.ziel.cn:7443': [{
+    label: '主租户',
+    value: 'paasport'
+  }],
+  'https://passport-gw.zielhome.com': [{
+    label: '主租户',
+    value: 'paasport'
+  }, {
+    label: '测试租户',
+    value: 'test'
+  }, {
+    label: 'DE租户',
+    value: 'de'
+  }, {
+    label: 'FR租户',
+    value: 'fr'
+  }, {
+    label: 'GB租户',
+    value: 'gb'
+  }, {
+    label: 'US租户',
+    value: 'us'
+  }]
+}

@@ -1,69 +1,19 @@
 import { SettingOutlined } from '@ant-design/icons';
-import { Affix, Button, Drawer, Modal, Popconfirm, Tooltip } from 'antd';
+import { Button, Modal, } from 'antd';
 import { Set as SetStorage, Get as GetStorage } from '@/storage/storage';
 import React, { useState } from 'react';
 import { ProFormSelect } from '@ant-design/pro-form';
+import { endpoints, tenants } from '@/services/paasport';
 
 
 const EnvironmentSelect: React.FC = () => {
-    const endpoints = [{
-        label: '本地开发环境',
-        value: 'http://paasport.com:9091'
-    }, {
-        label: 'IDC开发环境',
-        value: 'https://cn-shenzhen.passport.zieldev.com:7443'
-    }, {
-        label: 'IDC生产环境',
-        value: 'https://cn-shenzhen.passport.ziel.cn:7443',
-    }, {
-        label: '香港生产环境',
-        value: 'https://passport-gw.zielhome.com',
-    }];
-
-    const tenants = {
-        'http://paasport.com:9091': [{
-            label: '主租户',
-            value: 'paasport'
-        }],
-        'https://cn-shenzhen.passport.zieldev.com:7443': [{
-            label: '主租户',
-            value: 'paasport'
-        }, {
-            label: '测试租户',
-            value: 'test'
-        }],
-        'https://cn-shenzhen.passport.ziel.cn:7443': [{
-            label: '主租户',
-            value: 'paasport'
-        }],
-        'https://passport-gw.zielhome.com': [{
-            label: '主租户',
-            value: 'paasport'
-        }, {
-            label: '测试租户',
-            value: 'test'
-        }, {
-            label: 'DE租户',
-            value: 'de'
-        }, {
-            label: 'FR租户',
-            value: 'fr'
-        }, {
-            label: 'GB租户',
-            value: 'gb'
-        }, {
-            label: 'US租户',
-            value: 'us'
-        }]
-    }
-
     let localEndpoint = GetStorage('PAASPORT-ENDPOINT')
     if (localEndpoint == null) {
         localEndpoint = endpoints[0].value
         SetStorage('PAASPORT-ENDPOINT', localEndpoint, -1)
     }
 
-    const endpointTenants = tenants[localEndpoint]
+    // const endpointTenants = tenants[localEndpoint]
 
     let localTenant = GetStorage('PAASPORT-CURRENT-TENANT')
     if (localTenant == null) {

@@ -3,6 +3,7 @@ import ProTable, { ProColumns } from '@ant-design/pro-table';
 import { Avatar } from 'antd';
 import { GetInsiteMessageEventAllApp } from '@/services/paasport/message/message_umirequest';
 import { InsiteMessageEventTypeEnum } from '@/services/paasport';
+import { history } from 'umi';
 
 const AccountMessage: React.FC<COMMON.ReqWithUid> = (props) => {
   const { uid } = props;
@@ -44,9 +45,12 @@ const AccountMessage: React.FC<COMMON.ReqWithUid> = (props) => {
       title: '发送者',
       dataIndex: 'sender',
       render: (_, record) => [
-        <span>
-          <Avatar src={record.sender?.avatar}></Avatar> {record.sender?.nick_name}
-        </span>,
+        <a onClick={() => {
+          history.push('/account');
+          setTimeout(() => {
+            history.push(`/account/${record.sender?.id}/detail`);
+          })
+        }} > <Avatar src={record.sender?.avatar}></Avatar> {record.sender?.nick_name}</a >,
       ],
     },
     {

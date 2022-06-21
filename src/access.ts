@@ -15,6 +15,8 @@ export default function access(initialState: { currentUser?: PAASPORT.AccountInf
     protocolAllPermission: hasRole('protocolAllPermission', currentUser?.roles ?? {}),
     transportAnalsysisPermission: hasRole('transportAnalsysisPermission', currentUser?.roles ?? {}),
     searchTransportPermission: hasRole('searchTransportPermission', currentUser?.roles ?? {}),
+    transportAlterPermission: hasRole('transportAlterPermission', currentUser?.roles ?? {}),
+    transportErrorPermission: hasRole('transportErrorPermission', currentUser?.roles ?? {}),
   };
 }
 

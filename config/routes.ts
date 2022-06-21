@@ -89,7 +89,7 @@ export default [
     path: '/transport',
     name: '物流',
     icon: 'shopping',
-    access: 'transportAllPermission',
+    access: 'transportPermission',
     routes: [
       {
         path: '/transport/dashboard',
@@ -113,13 +113,13 @@ export default [
       },
       {
         path: '/transport/v2/alter',
-        access: 'transportAllPermission',
+        access: 'transportAlterPermission',
         name: '告警',
         component: './Transport/v2/Alter',
       },
       {
         path: '/transport/v2/error',
-        access: 'transportAllPermission',
+        access: 'transportErrorPermission',
         name: '错误',
         component: './Transport/v2/Error',
       },

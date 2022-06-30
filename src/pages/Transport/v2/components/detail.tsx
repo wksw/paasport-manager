@@ -1,12 +1,12 @@
-import { Divider, Drawer, Space, Timeline, Typography } from 'antd';
+import { Divider, Drawer, Space, Typography } from 'antd';
 import React, { } from 'react';
-import moment from 'moment';
 import ProDescriptions from '@ant-design/pro-descriptions';
 import { getCarrierV2 } from '@/utils/utils';
 import { TransportProvider } from '@/services/paasport';
 import { packageStatusIcon } from '@/components/Transport';
 import { Link } from 'umi';
 import { CloseOutlined, EyeOutlined } from '@ant-design/icons';
+import { TransportDetailContent } from '@/components/Transport/v2/TrackDetail';
 
 type DetailReq = {
     detail: TRANSPORT_V2.TrackInfo;
@@ -44,28 +44,7 @@ const Detail: React.FC<DetailReq> = (props) => {
             onClose={() => onClose(!visible)}
             extra={<CloseOutlined onClick={() => onClose(!visible)} />}
         >
-            {
-                detail.package_status == 'DELIVERED' && <>
-                    <Typography.Title level={4}>Delivered on {moment(detail.track.latest_event.created_at).format("YYYY-MM-DD")}</Typography.Title>
-                    <Divider />
-                </>
-            }
-            < Timeline >
-                {detail?.track?.events?.map((item: any) => (
-                    <Timeline.Item>
-                        <Space direction='vertical'>
-                            <Typography.Title level={5}> {item?.description}</Typography.Title>
-                            <Typography.Text type='secondary'>{item?.location?.country}{item?.location?.city ? ',' + item?.location?.city : ''} • {item.provider.name} </Typography.Text>
-                            <Typography.Text type='secondary'>{moment(item?.created_at).format("YYYY-MM-DD HH:mm:ss")}(Local time)</Typography.Text>
-                        </Space>
-                    </Timeline.Item>
-                ))}
-            </Timeline >
-            {
-                detail.package_status == 'DELIVERED' && <>
-                    <Divider /> <Typography.Text type='secondary' style={{ fontSize: 18 }}>destination is {detail.track.destination.country} • Transit in {detail.track.metrics.days_of_transit_done} days</Typography.Text>
-                </>
-            }
+            <TransportDetailContent detail={detail} />
             < Divider />
             <ProDescriptions
                 title='Shipment details'

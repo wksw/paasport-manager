@@ -5,7 +5,6 @@ export default function access(initialState: { currentUser?: PAASPORT.AccountInf
   const { currentUser } = initialState ?? {};
   return {
     canAdmin: currentUser && currentUser.access === 'admin',
-    public: true,
     searchAccountPermission: hasRole('searchAccountPermission', currentUser?.roles ?? {}),
     getAccountAllPermission: hasRole('getAccountAllPermission', currentUser?.roles ?? {}),
     accountSyncAllPermission: hasRole('accountSyncAllPermission', currentUser?.roles ?? {}),

@@ -6,8 +6,8 @@ COPY ./ /app/
 
 # http://192.168.6.34:8081/repository/npm-group/
 # RUN yarn config set registry 'http://192.168.6.34:8081/repository/npm-group/' && \
-RUN yarn config set registry 'http://10.0.5.193:8081/repository/ziel-npm-group/' && \
-    yarn --verbose add umi && \
+RUN cp -r /node_modules /app/ && \
+    ls -l /app && \
     yarn --verbose info install && \
     yarn run build 
 

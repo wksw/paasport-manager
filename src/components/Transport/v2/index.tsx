@@ -11,13 +11,9 @@ import {
     RocketTwoTone,
     CloseCircleTwoTone,
 } from '@ant-design/icons';
-import { Col, Row, Timeline, Tooltip, Typography } from 'antd';
+import { Col, Row, Tooltip, Typography } from 'antd';
 import { getCarrierV2 } from '@/utils/utils';
-import moment from 'moment';
-
-type TransportDetailProps = {
-    detail: TRANSPORT_V2.TrackInfo;
-};
+import { TransportDetailContent } from './TrackDetail';
 
 export function packageStatusIcon(status: any, fontSize: number) {
     switch (status) {
@@ -133,13 +129,7 @@ export const TransportDetail: React.FC<TransportDetailProps> = (props) => {
                 </Col>
             </Row>
             <Row justify="center">
-                <Timeline>
-                    {detail?.track?.events?.map((item: any) => (
-                        <Timeline.Item>
-                            <span style={{ fontWeight: 'bold' }}>{moment(item?.created_at).format("YYYY-MM-DD HH:mm:ss")}</span> {item?.location?.country}{item?.location?.city ? ',' + item?.location?.city : ''}: {item?.description}
-                        </Timeline.Item>
-                    ))}
-                </Timeline>
+                <TransportDetailContent detail={detail} />
             </Row>
         </ProCard>
     );

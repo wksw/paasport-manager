@@ -70,7 +70,7 @@ export async function getInitialState(): Promise<{
     }
     return undefined;
   };
-  // console.log('get init state', history.location.pathname)
+  console.log('get init state', history.location.pathname)
   // 如果不是登录页面，执行
   if (history.location.pathname !== loginPath && history.location.pathname != trackV2Path) {
     const currentUser = await fetchUserInfo();

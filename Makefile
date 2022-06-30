@@ -1,6 +1,6 @@
 DOCKER=docker
 # docker编译
-DOCKERBUILD=$(DOCKER) build --platform=amd64
+DOCKERBUILD=$(DOCKER) build --platform=amd64 --no-cache  --force-rm --compress --rm
 # docker运行
 DOCKERRUN=$(DOCKER) run 
 # docker镜像保存
@@ -46,6 +46,13 @@ DOCKER_REPO=$(DOCKER_REPO_HOST)/$(NAMESPACE)
 # 版本号
 VERSION=$(shell cat version)
 
+# 基础编译镜像
+BASE_IMAGE=paasport-manager:build_latest
+
+# 代码仓库
+GIT_REPO_HOST=gitee.com
+DOCKER_HUB_HOST=dockerhub.contoso.com
+
 
 all: help
 
@@ -63,8 +70,7 @@ update: ## 更新
 
 
 build: proto dockerfile version
-	# $(DOCKERRUN) --rm -w /app -v$$(pwd):/app node:lts \
-	# 	/bin/bash -c " yarn run build" 
+	$(DOCKERPULL) $(DOCKER_HUB_HOST)/paasport/$(BASE_IMAGE) || true
 	$(DOCKERBUILD) -t $(DOCKER_REPO)/$(DOCKERIMAGE):$(VERSION).$(TENANT) .
 	$(DOCKERPUSH) $(DOCKER_REPO)/$(DOCKERIMAGE):$(VERSION).$(TENANT) || true
 

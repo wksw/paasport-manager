@@ -10,10 +10,16 @@ import {
     HourglassTwoTone,
     RocketTwoTone,
     CloseCircleTwoTone,
+    DatabaseTwoTone,
+    BellTwoTone,
+    ShopTwoTone,
+    SoundTwoTone,
+    CompassTwoTone,
 } from '@ant-design/icons';
-import { Col, Row, Tooltip, Typography } from 'antd';
+import { Col, Row, Space, Tooltip, Typography } from 'antd';
 import { getCarrierV2 } from '@/utils/utils';
 import { TransportDetailContent } from './TrackDetail';
+import moment from 'moment';
 
 export function packageStatusIcon(status: any, fontSize: number) {
     switch (status) {
@@ -21,6 +27,24 @@ export function packageStatusIcon(status: any, fontSize: number) {
             return (
                 <Tooltip title="查询不到">
                     <FrownTwoTone style={{ fontSize: fontSize }} />
+                </Tooltip>
+            );
+        case 'ORDERED':
+            return (
+                <Tooltip title="已下单">
+                    <ShopTwoTone style={{ fontSize: fontSize }} />
+                </Tooltip>
+            );
+        case 'IN_WAREHOUSE':
+            return (
+                <Tooltip title="仓库处理中">
+                    <DatabaseTwoTone style={{ fontSize: fontSize }} />
+                </Tooltip>
+            );
+        case 'INFO_RECEIVED':
+            return (
+                <Tooltip title="待揽件">
+                    <SoundTwoTone style={{ fontSize: fontSize }} />
                 </Tooltip>
             );
         case 'IN_TRANSIT':
@@ -57,6 +81,12 @@ export function packageStatusIcon(status: any, fontSize: number) {
                     <CheckCircleTwoTone style={{ fontSize: fontSize }} />
                 </Tooltip>
             );
+        case 'OUT_FOR_DELIVERY':
+            return (
+                <Tooltip title="派送途中">
+                    <CompassTwoTone style={{ fontSize: fontSize }} />
+                </Tooltip>
+            );
         case 'EXCEPTION':
             // 可能异常
             return (
@@ -66,7 +96,7 @@ export function packageStatusIcon(status: any, fontSize: number) {
             );
         default:
             return (
-                <Tooltip title="未知错误">
+                <Tooltip title={status}>
                     <QuestionCircleTwoTone style={{ fontSize: fontSize }} />
                 </Tooltip>
             );
@@ -101,11 +131,13 @@ export const TransportDetail: React.FC<TransportDetailProps> = (props) => {
                             </Row>
                             <Row>
                                 <Col style={{ fontSize: 8 }}>
-                                    {detail?.track?.metrics?.days_of_transit_done !== 0 && (
-                                        <Typography.Text type="secondary" style={{ marginBottom: 0 }}>
-                                            {'妥投时间 ' + detail?.track?.metrics?.days_of_transit_done + ' (天)'}
-                                        </Typography.Text>
-                                    )}
+                                    <Space direction='vertical' >
+                                        {detail?.track?.metrics?.days_of_transit_done !== 0 && (
+                                            <Typography.Text type="secondary" style={{ marginBottom: 0 }}>
+                                                {'妥投时间 ' + detail?.track?.metrics?.days_of_transit_done + ' (天)'}
+                                            </Typography.Text>
+                                        )}
+                                    </Space>
                                 </Col>
                             </Row>
                         </Col>
@@ -128,6 +160,7 @@ export const TransportDetail: React.FC<TransportDetailProps> = (props) => {
                     </Row>
                 </Col>
             </Row>
+
             <Row justify="center">
                 <TransportDetailContent detail={detail} />
             </Row>

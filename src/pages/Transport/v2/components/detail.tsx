@@ -3,7 +3,7 @@ import React, { } from 'react';
 import ProDescriptions from '@ant-design/pro-descriptions';
 import { getCarrierV2 } from '@/utils/utils';
 import { TransportProvider } from '@/services/paasport';
-import { packageStatusIcon } from '@/components/Transport';
+import { packageStatusIcon } from '@/components/Transport/v2';
 import { Link } from 'umi';
 import { CloseOutlined, EyeOutlined } from '@ant-design/icons';
 import { TransportDetailContent } from '@/components/Transport/v2/TrackDetail';

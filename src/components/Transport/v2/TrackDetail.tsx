@@ -5,12 +5,18 @@ import React from 'react';
 export const TransportDetailContent: React.FC<TransportDetailProps> = (props) => {
     const { detail } = props;
     return (<>
-        {
-            detail.package_status == 'DELIVERED' && <>
-                <Typography.Title level={4}>Delivered on {moment(detail.track.latest_event.created_at).format("YYYY-MM-DD")}</Typography.Title>
-                <Divider />
-            </>
+        <Divider> {
+            detail.package_status == 'DELIVERED' &&
+            <Typography.Title level={4}>
+                Delivered on {moment(detail.track.latest_event.created_at).format("YYYY-MM-DD")}<Typography.Text type='secondary' style={{ fontSize: 10 }}>(Local time)</Typography.Text>
+            </Typography.Title>
         }
+            <Space>
+                <Typography.Text type='secondary'> {moment(detail.created_at).format("YYYY-MM-DD hh:mm:ss")}</Typography.Text>
+                {'->'}
+                <Typography.Text type='secondary'> {moment(detail.updated_at).format("YYYY-MM-DD hh:mm:ss")}</Typography.Text>
+            </Space>
+        </Divider>
         < Timeline >
             {detail?.track?.events?.map((item: any) => (
                 <Timeline.Item>
@@ -24,7 +30,7 @@ export const TransportDetailContent: React.FC<TransportDetailProps> = (props) =>
         </Timeline >
         {
             detail.package_status == 'DELIVERED' && <>
-                <Divider /> <Typography.Text type='secondary' style={{ fontSize: 18 }}>destination is {detail.track.destination.country} • Transit in {detail.track.metrics.days_of_transit_done} days</Typography.Text>
+                <Divider> <Typography.Text type='secondary' style={{ fontSize: 18 }}>destination is {detail.track.destination.country} • Transit in {detail.track.metrics.days_of_transit_done} days</Typography.Text></Divider>
             </>
         }
     </>

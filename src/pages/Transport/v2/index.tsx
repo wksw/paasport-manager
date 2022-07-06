@@ -148,7 +148,8 @@ const Transport: React.FC = (props) => {
             dataIndex: 'version',
             key: 'version',
             valueType: 'text',
-            align: 'center'
+            align: 'center',
+            hideInSearch: true
         },
         {
             title: '供应商',

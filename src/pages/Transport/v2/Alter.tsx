@@ -89,6 +89,22 @@ const TransportAlter: React.FC = (props) => {
             initialValue: query.resolved || ''
         },
         {
+            title: '物流创建时间',
+            hideInSearch: true,
+            sorter: true,
+            valueType: 'dateTime',
+            dataIndex: 'track_info.created_at',
+            renderText: (_, record) => record.track_info.created_at
+        },
+        {
+            title: '物流最后更新时间',
+            hideInSearch: true,
+            sorter: true,
+            valueType: 'dateTime',
+            dataIndex: 'track_info.updated_at',
+            renderText: (_, record) => record.track_info.updated_at
+        },
+        {
             title: '发生时间',
             hideInSearch: true,
             sorter: true,

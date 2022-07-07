@@ -4,17 +4,17 @@ import {
     GetTracks,
     Registe,
     DeleteTracks,
+    Push,
 } from '@/services/paasport/transport/v2/transport_v2_umirequest';
 import { packageStatusIcon } from '@/components/Transport/v2';
 import { TransportPackageStatusEnumV2, TransportStatusEnumV2, TransportPackageSubStatusEnum, TransportProvider } from '@/services/paasport';
-import { Button, Divider, Drawer, Space, Timeline, Typography } from 'antd';
+import { Button } from 'antd';
 import { getCarrierByName, getCarrierV2 } from '@/utils/utils';
 import { PageContainer } from '@ant-design/pro-layout';
 import carriers from '@/services/17track_carriers';
-import { history, Link } from 'umi';
+import { history } from 'umi';
 import moment from 'moment';
-import { CloseOutlined, EyeOutlined, PlusOutlined } from '@ant-design/icons';
-import ProDescriptions from '@ant-design/pro-descriptions';
+import { PlusOutlined } from '@ant-design/icons';
 import Detail from './components/detail';
 
 const Transport: React.FC = (props) => {
@@ -31,6 +31,12 @@ const Transport: React.FC = (props) => {
     const deleteTransport = async (record: TRANSPORT_V2.TrackInfo) => {
         await DeleteTracks({
             tracks: [{ id: record.id }]
+        })
+        ref.current?.reload();
+    }
+    const pushTransport = async (record: TRANSPORT_V2.TrackInfo) => {
+        await Push({
+            id: record.id
         })
         ref.current?.reload();
     }
@@ -201,6 +207,7 @@ const Transport: React.FC = (props) => {
                     menus={[
                         { key: 'reAdd', name: <Button type="link" onClick={() => reAdd(record)} disabled={record.track_status != "REGISTING" && record.track_status != "REGISTE_FAIL"}>重新注册</Button> },
                         { key: 'delete', name: <Button type="link" onClick={() => deleteTransport(record)} disabled={record.track_status == "DELTEING"}>删除</Button> },
+                        { key: 'push', name: <Button type="link" onClick={() => pushTransport(record)} >更新</Button> },
                     ]}
                 />,
             ],

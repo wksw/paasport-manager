@@ -148,6 +148,7 @@ export const TransportStatusEnumV2 = {
   "DELTEING": "删除中",
   "DELETE_FAIL": "删除失败",
   "DELETED": "已删除",
+  "PUSH_FAIL": "推送失败",
 }
 
 export const TransportPackageStatusEnumV2 = {

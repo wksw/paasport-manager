@@ -80,8 +80,8 @@ const TemplateEditor: React.FC<{
             <ProFormText name="id" disabled label="ID" style={{ display: 'none' }} />
             <ProFormText name="name" label="名称" placeholder="模版名称" />
             <ProFormText name="title" label="标题" placeholder="标题" tooltip="邮件subject" />
-            <ProFormText name="sign_name" label="签名" initialValue="Paasport" />
-            <ProFormText name="template_code" label="第三方模版ID" />
+            <ProFormText name="sign_name" label="签名" initialValue="Paasport" tooltip="短信签名" />
+            <ProFormText name="template_code" label="第三方模版ID" tooltip="如果不是自渲染则需要第三方模版ID" />
             <ProFormCheckbox name="render_self" label="是否自渲染" />
             <ProFormSelect name="type" label="模版类型" options={[
                 {
@@ -103,7 +103,7 @@ const TemplateEditor: React.FC<{
             ]} />
             <ProFormTextArea name="params"
                 fieldProps={{ autoSize: { minRows: 5, maxRows: 10 } }}
-                label="模版参数" />
+                label="模版参数" tooltip="json格式字符串, 如果发送消息是没有携带相应参数则默认填入该字段中的参数" />
             <ProFormTextArea name="content"
                 fieldProps={{ autoSize: { minRows: 10, maxRows: 20 } }}
                 label="模版内容" />

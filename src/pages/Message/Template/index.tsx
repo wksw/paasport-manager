@@ -1,15 +1,30 @@
-import React from 'react';
-import ProTable, { ProColumns } from '@ant-design/pro-table';
-import { GetMessageTemplates } from '@/services/paasport/message/message_umirequest';
+import React, { useRef, useState } from 'react';
+import ProTable, { ActionType, ProColumns, TableDropdown } from '@ant-design/pro-table';
+import { DeleteMessageTemplate, GetMessageTemplates, OpenCloseTemplate } from '@/services/paasport/message/message_umirequest';
 import { MessageTypeEnum } from '@/services/paasport';
-import { MessageType } from '@/services/paasport/common/common';
 import { PageContainer } from '@ant-design/pro-layout';
 import { StatusBool } from '@/services/paasport/common/common';
+import { Button } from 'antd';
+import { PlusOutlined } from '@ant-design/icons';
+import TemplateEditor from './components/TemplateEditor';
+import { Get as GetStorage } from '@/storage/storage';
 // import defineConfig from '../../../../config/config';
 
 // const { base_url } = defineConfig;
 
 const Templates: React.FC = () => {
+  const [editorVisible, setEditorVisible] = useState(false);
+  const [templateInfo, setTemplateInfo] = useState({});
+  const [editorModel, setEditorModel] = useState("create")
+  const ref = useRef<ActionType>();
+  const deleteTemplate = async (id: string) => {
+    await DeleteMessageTemplate({ id: id })
+    ref.current?.reload()
+  }
+  const enableTemplate = async (record: MESSAGE.MessageTemplateInfo) => {
+    await OpenCloseTemplate({ template_id: record.id, enabled: !record.enabled })
+    ref.current?.reload()
+  }
   const columns: ProColumns<MESSAGE.MessageTemplateInfo>[] = [
     {
       title: '名称',
@@ -73,14 +88,24 @@ const Templates: React.FC = () => {
       key: 'option',
       valueType: 'option',
       render: (_, record) => [
-        record.type === MessageType.M_EAMIL && record.render_self == StatusBool.SB_TRUE && (
-          <a
-            href={`${process.env.base_url}/a1/static/template?id=${record.id}&params=${record.params}`}
-            target="view_window"
-          >
-            预览
-          </a>
-        ),
+        <a onClick={() => {
+          setEditorVisible(!editorVisible)
+          setTemplateInfo(record);
+          setEditorModel("update")
+        }}>编辑</a>,
+        <TableDropdown
+          key="actionGroup"
+          menus={[
+            {
+              key: 'preview', name: <Button type='link'
+                onClick={() => window.open(`${GetStorage("PAASPORT-ENDPOINT")}/a1/static/template?id=${record.id}&params=${record.params}`, "_blank")}
+                disabled={record.render_self != StatusBool.SB_TRUE}
+              >预览</Button>
+            },
+            { key: 'delete', name: <Button type="link" onClick={() => deleteTemplate(record.id)}>删除</Button> },
+            { key: 'enable', name: <Button type='link' onClick={() => enableTemplate(record)}>{record.enabled ? '禁用' : '启用'}</Button> }
+          ]}
+        />,
       ],
     },
   ];
@@ -91,9 +116,20 @@ const Templates: React.FC = () => {
       }}
     >
       <ProTable<MESSAGE.MessageInfo, COMMON.ResultWithPage>
-        toolBarRender={false}
+        toolbar={{
+          title: (<Button key="button" icon={<PlusOutlined />} type="primary" onClick={() => {
+            setEditorVisible(!editorVisible)
+            setTemplateInfo({});
+            setEditorModel("create");
+          }}>新建</Button>),
+        }}
+        options={{
+          density: false,
+          setting: false,
+        }}
         search={false}
         columns={columns}
+        actionRef={ref}
         request={async (
           params: any & {
             pageSize: number;
@@ -115,8 +151,16 @@ const Templates: React.FC = () => {
           };
         }}
       ></ProTable>
+      <TemplateEditor visible={editorVisible}
+        templateInfo={templateInfo}
+        model={editorModel}
+        cancel={(visible: boolean) => {
+          ref.current?.reload();
+          setEditorVisible(visible)
+        }} />
     </PageContainer>
   );
 };
 
 export default Templates;
+

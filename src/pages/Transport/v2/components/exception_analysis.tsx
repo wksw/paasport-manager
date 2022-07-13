@@ -12,6 +12,7 @@ type ExceptionAnalysisReq = {
     setReturningToSenderTotal: (total: number) => void;
 }
 const ExceptionAnalysis: React.FC<ExceptionAnalysisReq> = (props) => {
+    const dateFormat = 'YYYY-MM-DD';
     const { analysisReq, pieConfig, setReturnedToSenderTotal, setReturningToSenderTotal } = props;
     const rfc3339 = 'YYYY-MM-DDTHH:mm:ssZ';
     const [transportExceptionReasonsConfig, setTransportExceptionReasonsConfig] = useState({
@@ -27,7 +28,7 @@ const ExceptionAnalysis: React.FC<ExceptionAnalysisReq> = (props) => {
     const [transportExceptionsConfig, setTransportExceptionsConfig] = useState({
         ...pieConfig,
         angleField: 'total',
-        colorField: 'package_status',
+        colorField: 'carrier',
         onReady: (plot: any) => {
             plot.on("plot:click", (event: any) => {
                 history.push(`/transport/v2/list?carrier=${event?.data?.data?.carrier}&package_status=EXCEPTION&begin_date=${analysisReq.begin_date.format(dateFormat)}&end_date=${analysisReq.end_date.format(dateFormat)}`)

@@ -1,6 +1,23 @@
 ﻿
 export default [
   {
+    path: '/dashboard',
+    name: 'Dashboard',
+    icon: 'dashboard',
+    access: 'public',
+    routes: [{
+      path: '/dashboard/audit',
+      name: '审计',
+      access: 'public',
+      component: './Audits/Dashboard'
+    }, {
+      path: '/dashboard/transport',
+      access: 'transportAnalsysisPermission',
+      name: '物流',
+      component: './Transport/v2/Dashboard',
+    },]
+  },
+  {
     path: '/account',
     name: '账户',
     icon: 'user',
@@ -92,22 +109,15 @@ export default [
     access: 'transportPermission',
     routes: [
       {
-        path: '/transport/dashboard',
-        icon: 'dashboard',
-        access: 'transportAnalsysisPermission',
-        name: '看板',
-        component: './Transport/v2/Dashboard',
-      },
-      {
         path: '/transport/list',
-        name: '物流追踪',
+        name: '追踪',
         hideInMenu: true,
         access: 'searchTransportPermission',
         component: './Transport',
       },
       {
         path: '/transport/v2/list',
-        name: '物流追踪',
+        name: '追踪',
         access: 'searchTransportPermission',
         component: './Transport/v2',
       },
@@ -144,7 +154,7 @@ export default [
   {
     path: '/',
     access: 'public',
-    redirect: '/account/list',
+    redirect: '/dashboard/audit',
   },
   {
     component: './404',

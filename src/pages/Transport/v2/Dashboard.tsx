@@ -17,10 +17,11 @@ import { TransportProvider } from '@/services/paasport/common/common';
 const Dashboard: React.FC = (props) => {
     const { location: { query } } = props;
     const dateFormat = 'YYYY-MM-DD';
+    const rfc3339 = 'YYYY-MM-DDTHH:mm:ssZ';
     console.log('--quer carrier---', query.carrier);
     const [analysisReq, setAnalysisReq] = useState({
-        begin_date: moment(moment().add(-7, 'days'), dateFormat),
-        end_date: moment(moment().add(1, 'days'), dateFormat),
+        begin_date: moment(moment().add(-7, 'days'), rfc3339),
+        end_date: moment(moment().add(1, 'days'), rfc3339),
         app_id: '0',
         carrier: query.carrier ? getCarrierByName(query.carrier) : 0,
         provider: query.provider ? TransportProvider[query.provider] : -1,
@@ -77,10 +78,11 @@ const Dashboard: React.FC = (props) => {
                         startEnd: [analysisReq.begin_date, analysisReq.end_date]
                     }}
                     onFinish={async (values) => {
+                        console.log("-----date---", values, moment().format("HH:mm:ssZ"));
                         setAnalysisReq({
                             ...analysisReq,
-                            begin_date: moment(values.startEnd[0], dateFormat),
-                            end_date: moment(values.startEnd[1], dateFormat),
+                            begin_date: moment(`${values.startEnd[0]}T${moment().format("HH:mm:ssZ")}`, rfc3339),
+                            end_date: moment(`${values.startEnd[1]}T${moment().format("HH:mm:ssZ")}`, rfc3339),
                         })
                     }}
                     submitter={{

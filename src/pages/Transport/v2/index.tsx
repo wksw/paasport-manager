@@ -263,10 +263,10 @@ const Transport: React.FC = (props) => {
                         page: params.current,
                         size: params.pageSize,
                         sort: sortStr,
-                        created_at_from: params.created_at_from_to ? moment(params?.created_at_from_to[0]).format("YYYY-MM-DDTHH:mm:ssZ") : '',
-                        created_at_to: params.created_at_from_to ? moment(params?.created_at_from_to[1]).format("YYYY-MM-DDTHH:mm:ssZ") : '',
-                        updated_at_from: params.updated_at_from_to ? moment(params?.updated_at_from_to[0]).format("YYYY-MM-DDTHH:mm:ssZ") : '',
-                        updated_at_to: params.updated_at_from_to ? moment(params?.updated_at_from_to[1]).format("YYYY-MM-DDTHH:mm:ssZ") : '',
+                        created_at_from: params.number == '' || params.order_id == '' ? params.created_at_from_to ? moment(params?.created_at_from_to[0]).format("YYYY-MM-DDTHH:mm:ssZ") : '' : '',
+                        created_at_to: params.number == '' || params.order_id == '' ? params.created_at_from_to ? moment(params?.created_at_from_to[1]).format("YYYY-MM-DDTHH:mm:ssZ") : '' : '',
+                        updated_at_from: params.number == '' || params.order_id == '' ? params.updated_at_from_to ? moment(params?.updated_at_from_to[0]).format("YYYY-MM-DDTHH:mm:ssZ") : '' : '',
+                        updated_at_to: params.number == '' || params.order_id == '' ? params.updated_at_from_to ? moment(params?.updated_at_from_to[1]).format("YYYY-MM-DDTHH:mm:ssZ") : '' : '',
                     });
                     return {
                         data: resp.data,

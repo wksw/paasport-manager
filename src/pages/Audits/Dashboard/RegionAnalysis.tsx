@@ -1,12 +1,12 @@
-import Earth from "3d-earth";
-import { City } from "3d-earth/dist/types/types";
+import Earth from "@/thirdparty/3d-earth/src";
+import { City } from "@/thirdparty/3d-earth/src/types";
 import { GetRegionAnalysis } from "@/services/paasport/audit/v2/audit_v2_umirequest";
 import React, { useEffect } from "react";
 
 const RegionAnalysis: React.FC = () => {
     useEffect(() => {
         const getRegionAnalysis = async () => {
-            const resp = await GetRegionAnalysis({})
+            const resp = await GetRegionAnalysis({ sort: 'total_counts' })
             var regions: City[] = []
             for (const region of resp.data[0].data) {
                 regions.push({

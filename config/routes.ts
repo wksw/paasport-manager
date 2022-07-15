@@ -9,7 +9,8 @@ export default [
       path: '/dashboard/audit',
       name: '审计',
       access: 'public',
-      component: './Audits/Dashboard'
+      layout: false,
+      component: '@/pages/Audits/Dashboard'
     }, {
       path: '/dashboard/transport',
       access: 'transportAnalsysisPermission',

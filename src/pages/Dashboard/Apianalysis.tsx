@@ -37,7 +37,7 @@ const ApiAnalysis: React.FC<{ setViews: (views: number) => void }> = (props) => 
     useEffect(() => {
         const getApiAnalysis = async () => {
             const resp = await GetApiAnalysis({ sort: 'total_counts' })
-            var data = []
+            var data: AUDIT_V2.ApiAnalysisData[] = []
             for (let i = 0; i < 3; i++) {
                 data.push(resp.data[0].data[i])
             }

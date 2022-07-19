@@ -45,7 +45,6 @@ export async function getInitialState(): Promise<{
       if (params.get('tenant')) {
         SetStorage('PAASPORT-CURRENT-TENANT', params.get('tenant'), -1);
       }
-      // console.log('----token=', params.get('token'));
       if (params.get('token')) {
         const tokenDetail = await LoginWithToken({}, {
           headers: {
@@ -61,18 +60,11 @@ export async function getInitialState(): Promise<{
         roles: roles,
       };
     } catch (error) {
-      // let redirectPath = location.pathname
-      // console.log('------fetchuserInfo', redirectPath == loginPath)
-      // let params = new URLSearchParams(location.search);
-      // console.log('----token=', params.get('token'));
-      console.log('-----error', error);
-      // history.push(loginPath + redirectPath == loginPath ? '' : `?redirect=${encodeURIComponent(redirectPath)}`);
     }
     return undefined;
   };
   // 如果不是登录页面，执行
   var pathName = history.location.pathname.replace(/\/$/, '');
-  console.log('get init state', pathName);
   if (pathName !== loginPath && pathName != trackV2Path) {
     const currentUser = await fetchUserInfo();
     return {
@@ -176,7 +168,6 @@ const paasportRequestInterceptor: RequestInterceptor = (
   };
   const token = GetStorage('X-Auth-Token');
   const tenant = GetStorage("PAASPORT-CURRENT-TENANT")
-  // console.log('--------tenant', tenant);
   options.headers = {
     ...options.headers,
     'X-Auth-Token': token?.token,
@@ -194,12 +185,6 @@ const paasportResponseInterceptor: ResponseInterceptor = (
   options: RequestOptionsInit,
 ) => {
   if (response.status == 401) {
-    console.log('----401-', location.pathname);
-    let redirectPath = location.pathname
-    console.log('------fetchuserInfo', redirectPath == loginPath)
-    let params = new URLSearchParams(location.search);
-    console.log('----token=', params.get('token'));
-    // history.push(loginPath + redirectPath == loginPath ? '' : `?redirect=${encodeURIComponent(redirectPath)}`);
     history.push(loginPath);
   }
   return response;

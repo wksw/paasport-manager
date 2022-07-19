@@ -51,10 +51,10 @@ export const getCityMeshGroup = (cityList: City[]) => {
 
     // 如果不同mesh材质的透明度、颜色等属性同一时刻不同，材质不能共享
     var cityWaveMaterial = new MeshBasicMaterial({
-      color: '#f0e20c',
+      color: '#ffff00',
       map: texture,
       transparent: true, //使用背景透明的png贴图，注意开启透明计算
-      opacity: 1.0,
+      opacity: 0.0,
       side: DoubleSide, //双面可见
       depthWrite: false, //禁止写入深度缓冲区数据
     });

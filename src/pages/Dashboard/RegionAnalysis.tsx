@@ -3,7 +3,8 @@ import { City } from "@/thirdparty/3d-earth/src/types";
 import { GetRegionAnalysis } from "@/services/paasport/audit/v2/audit_v2_umirequest";
 import React, { useEffect } from "react";
 
-const RegionAnalysis: React.FC = () => {
+const RegionAnalysis: React.FC<{ setLocations: (locations: AUDIT_V2.RegionAnalysisData[]) => void }> = (props) => {
+    const { setLocations } = props
     useEffect(() => {
         const getRegionAnalysis = async () => {
             const resp = await GetRegionAnalysis({ sort: 'total_counts' })
@@ -16,8 +17,9 @@ const RegionAnalysis: React.FC = () => {
                     value: region.total_counts,
                 })
             }
+            setLocations(resp.data[0].data)
             let e = new Earth("region_analysis", regions, [], {
-                earthRadius: 12,
+                earthRadius: 13,
                 autoRotate: true,
                 zoomChina: false,
                 starBackground: true,

@@ -6,11 +6,12 @@ export default [
     icon: 'dashboard',
     access: 'public',
     routes: [{
-      path: '/dashboard/audit',
+      path: '/dashboard',
       name: '审计',
       access: 'public',
       layout: false,
-      component: '@/pages/Audits/Dashboard'
+      hideInMenu: true,
+      component: '@/pages/Dashboard'
     }, {
       path: '/dashboard/transport',
       access: 'transportAnalsysisPermission',
@@ -155,7 +156,7 @@ export default [
   {
     path: '/',
     access: 'public',
-    redirect: '/dashboard/audit',
+    redirect: '/dashboard',
   },
   {
     component: './404',

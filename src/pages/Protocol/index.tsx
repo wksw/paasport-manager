@@ -1,6 +1,6 @@
 import ProTable, { ProColumns } from '@ant-design/pro-table';
 import React from 'react';
-import { GetAll as GetProtocols } from '@/services/paasport/protocol/protocol_umirequest';
+import { GetAll as GetProtocols } from '@/services/paasport/protocol/pact_umirequest';
 import { PageContainer } from '@ant-design/pro-layout';
 
 const Protocols: React.FC = () => {
